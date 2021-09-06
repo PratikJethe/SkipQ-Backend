@@ -12,7 +12,6 @@ const app:Application = express()
 
 
 
-clinicSubscriptionService.generateStartEndDate(1)
 mongoConnect().then(()=>{
    console.log('connected')
 }).catch((error)=>{
