@@ -1,3 +1,10 @@
-import userAuthRoute from "./userAuth.route";
+import userAuthRoutes from "./userAuth.route";
 
-export{userAuthRoute}
+import { Router } from 'express'
+
+const userRoutes:Router = Router()
+
+userRoutes.use('/auth',userAuthRoutes)
+
+
+export  default userRoutes

@@ -20,7 +20,9 @@ export const userRegisterValidation = [
     }),
     check('gender','Invalid gender value').optional().exists({checkFalsy:true}).isString().bail().custom((gender)=>{
         return  Object.values(genderEnum).includes(gender)
-    })
+    }),
+    check('dateOfBirth','Invalid Date of birth').optional().exists({checkFalsy:true}).bail().isString().bail().isISO8601(),
+    check('profilePicUrl','Invalid profile pic url').optional().exists({checkFalsy:true}).bail().isString().bail()
     
     // custom((apartment)=>{
     //     console.log('aprt',apartment)

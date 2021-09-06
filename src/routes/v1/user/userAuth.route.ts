@@ -1,8 +1,10 @@
 
 import { Router } from "express";
-import  userController  from "../../../controllers/authentication/userAuth.controller";
+import  userController  from "../../../controllers/user/userAuth.controller";
 import { validationError } from "../../../middlewares/request";
-import { userRegisterValidation,phoneLoginValidation } from "../../../validators/request/userRequest.validator";
+import { authMiddleware } from "../../../middlewares/request/authentication.middleware";
+import { checkIfUserEmailOrPhoneExist } from "../../../middlewares/user/user.middleware";
+import { userRegisterValidation,phoneLoginValidation } from "../../../validators/user/userRequest.validator";
 
 const router = Router()
 
@@ -10,8 +12,8 @@ const router = Router()
 
 
 
-router.post('/register',userRegisterValidation,validationError, userController.registerUser)
-router.post('/phoneLogin',[...phoneLoginValidation,validationError], userController.phoneLogin)
+router.post('/register',[...userRegisterValidation,validationError,checkIfUserEmailOrPhoneExist], userController.registerUser)
+router.post('/phone-login',[...phoneLoginValidation,validationError,authMiddleware], userController.phoneLogin)
 
 
-export default router
+export  default router

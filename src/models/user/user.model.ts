@@ -1,8 +1,8 @@
-import { IUser } from "../../interfaces/user/user.interface";
+import { IUser, IUserModel } from "../../interfaces/user/user.interface";
 import { genderEnum, authProviderEnum } from "../../constants/enums";
 import { Mongoose, Schema, model, Model } from "mongoose";
 
-const UserSchema: Schema<IUser> = new Schema<IUser>(
+const UserSchema: Schema<IUserModel> = new Schema<IUserModel>(
   {
     fullName: {
       type: String,
@@ -23,7 +23,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     apartment: {
       type: String
     },
-    address2: {
+    address: {
       type: String
     },
     geometry: {
@@ -34,10 +34,20 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     fcm: {
       type: String,
       required: true
+    },
+    dateOfBirth:{
+       type:Date,
+    },
+    profilePicUrl:{
+      type:String,   
+    },
+    gender:{
+      type:String,
+      enum:genderEnum
     }
   },
   { timestamps: true }
 );
 
 UserSchema.index({ geometry: "2dsphere" });
-export const UserModel: Model<IUser> = model<IUser>("user", UserSchema);
+export const UserModel: Model<IUserModel> = model<IUserModel>("user", UserSchema);

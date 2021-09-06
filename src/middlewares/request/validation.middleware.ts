@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
+import { IApiResponse } from "../../interfaces/apiResponse.interface";
+import { apiResponseService } from "../../services/apiResponse.service";
 
 export function validationError(
   req: Request,
@@ -7,10 +9,18 @@ export function validationError(
   next: NextFunction
 ) {
   const errors = validationResult(req);
+ 
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+
+    let response:IApiResponse ={
+      status:400,
+      errorMsg:errors.array()[0].msg,
+    } 
+    return apiResponseService.responseHandler(response,req,res,next)
   }
+
+
 
   next();
 }
