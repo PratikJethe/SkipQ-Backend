@@ -10,7 +10,9 @@ import { apiResponseService } from "../../services/apiResponse.service";
 import { jwtService } from "../../services/jsonWebToken.service";
 
 class UserController {
-  async registerUser(req: Request, res: Response, next: NextFunction) {
+
+  
+async registerUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { fullName, authProvider, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth }: IUserRegistrationDetails = req.body;
 
@@ -62,6 +64,8 @@ class UserController {
 
   async phoneLogin(req: Request, res: Response, next: NextFunction) {
     const { phoneNo } = req.body; //verify firebase id
+    console.log(req.cookies);
+    console.log(phoneNo)
     try {
       const user: IUserModel | null = await userDao.findByNumber(phoneNo);
 
@@ -81,7 +85,46 @@ class UserController {
       const token = jwtService.createJwt({ id: user._id }, 2629746);
 
       res.cookie("token", token, {
-        maxAge: 2592000000,
+        maxAge: 2592000000, //30 days in miliseconds
+        // maxAge: 60000, //  60 sec for test
+        httpOnly: true,
+      });
+
+      return next(response);
+    } catch (error) {
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
+
+  async getUserById(req: Request, res: Response, next: NextFunction) {
+
+        
+    try {
+      const user: IUserModel | null = await userDao.findById(req.client.id)
+
+      if (!user) {
+        let response: IApiResponse = {
+          status: 404,
+          errorMsg: "user not found"
+        };
+
+        return next(response);
+      }
+      console.log(user);
+
+      const response: IApiResponse = {
+        data: user,
+        status: 200
+      };
+
+      const token = jwtService.createJwt({ id: user._id }, 2629746);
+
+      res.cookie("token", token, {
+        // maxAge: 2592000000, //30 days in miliseconds
+        maxAge: 60000, //  60 sec for test
         httpOnly: true,
       });
 

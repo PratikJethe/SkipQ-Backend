@@ -15,7 +15,7 @@ const router = Router()
 
 
 router.post('/register',[...clinicRegisterValidation,validationError,checkIfClinicEmailOrPhoneExist], clinicAuthController.registerClinic)
-router.post('/phone-login',[...phoneLoginValidation,validationError,authMiddleware], clinicAuthController.phoneLogin)
+router.post('/phone-login',[...phoneLoginValidation,validationError], clinicAuthController.phoneLogin)
 
 
 export default router

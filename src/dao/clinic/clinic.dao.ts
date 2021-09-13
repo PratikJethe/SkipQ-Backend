@@ -24,6 +24,17 @@ class ClinicDao {
 
     return clinic;
   }
+
+  async updateClinicStart(id:string,hasStarted:boolean): Promise<IClinicModel | null>{
+    const clinic :  IClinicModel | null = await ClinicModel.findOneAndUpdate({ _id: id }, { $set: { hasClinicStarted: hasStarted } }, { new: true });
+
+    return clinic
+  }
+
+  async searchDoctor(){
+    const clinic = ClinicModel.aggregate([
+    ])
+  }
 }
 
 export default new ClinicDao();

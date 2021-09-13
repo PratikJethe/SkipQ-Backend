@@ -63,6 +63,8 @@ export async function checkIfTokenExistForUser(req: Request, res: Response, next
     return apiResponseService.responseHandler(response, req, res, next);
   }
 }
+
+
 //checks if token exist for clinic which is to be updated
 
 export async function checkIfTokenExistForClinic(req: Request, res: Response, next: NextFunction) {

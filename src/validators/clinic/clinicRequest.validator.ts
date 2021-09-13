@@ -12,6 +12,7 @@ export const clinicRegisterValidation = [
     }),
     check('apartment','Invalid apartment value').optional().exists({checkFalsy:true}).isString(),
     check('address','Invalid address value').exists({checkFalsy:true}).isString().withMessage('Invalid address'),
+    check('pincode','Pincode required').exists({checkFalsy:true}).isNumeric().withMessage('Invalid pincode').matches(/^[1-9][0-9]{5}$/).withMessage('Invalid 6 digit pincode'),
     check('email','Invalid email value').optional().exists({checkFalsy:true}).isString().isEmail().withMessage('Invalid email'),
     check('coordinates','Invalid coordinates').exists({checkFalsy:true}).isArray({min:2,max:2}).bail().custom((coordinates)=>{
         console.log(coordinates)

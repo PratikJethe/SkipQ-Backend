@@ -17,7 +17,7 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
       required: true,
       unique: true
     },
-    email: { type: String },
+    email: { type: String,unique:true },
 
     authProvider: {
       type: String,
@@ -34,6 +34,12 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
     geometry: {
       type: { type: String, required: true },
       coordinates: [{ type: Number, required: true }]
+    },
+
+    pincode:{
+     type:Number,
+     required:true
+     
     },
 
     fcm: {
@@ -63,10 +69,15 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
     subEndDate: {
       type: Date,
       required: true
+    },
+    hasClinicStarted:{
+      type:Boolean,
+      default:false
     }
   },
   { timestamps: true }
 );
 
+ClinicSchema.index({doctorName:'text',clinicName:'text',apartment:'text',address:'text',speciality:'text',pincode:"text"});
 ClinicSchema.index({ geometry: "2dsphere" });
 export const ClinicModel: Model<IClinicModel> = model<IClinicModel>("clinic", ClinicSchema);

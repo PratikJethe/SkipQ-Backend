@@ -35,7 +35,7 @@ export async function checkIfUserEmailOrPhoneExist(req: Request, res: Response, 
 
   try {
     const userExist: boolean = await userService.checkIfEmailorPhoneExist(req.body.phoneNo,req.body.email);
-
+   console.log(userExist)
     if (userExist) {
       let response: IApiResponse = {
         status: 400,

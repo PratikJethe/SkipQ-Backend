@@ -1,15 +1,83 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose, { Mongoose } from "mongoose";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
+import clinicDao from "../../dao/clinic/clinic.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
 import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
 import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
 
 class ClinicQueueController {
+  async startClinic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, true);
+
+      if (!clinic) {
+        let response: IApiResponse = {
+          status: 500
+        };
+
+        return next(response);
+      }
+
+      let response: IApiResponse = {
+        status: 200,
+        data: clinic
+      };
+
+      return next(response);
+    } catch (error) {
+      console.log(error);
+      let response: IApiResponse = {
+        status: 500
+      };
+
+      return next(response);
+    }
+  }
+
+
+  
+  async stopClinic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, false);
+
+      if (!clinic) {
+        let response: IApiResponse = {
+          status: 500
+        };
+
+        return next(response);
+      }
+
+      let response: IApiResponse = {
+        status: 200,
+        data: clinic
+      };
+
+      return next(response);
+    } catch (error) {
+      console.log(error);
+      let response: IApiResponse = {
+        status: 500
+      };
+
+      return next(response);
+    }
+  }
+
   // Token Action By User
   async requestToken(req: Request, res: Response, next: NextFunction) {
     try {
+
+     if(!req.clinic.hasClinicStarted){
+      let response: IApiResponse = {
+        status: 400,
+        errorMsg:"clinic not started yet"
+      };
+      return next(response)
+     }
+
       const token: IClinicQueue = {
         userId: req.user.id,
         clinicId: req.clinic.id,
@@ -225,18 +293,10 @@ class ClinicQueueController {
     }
   }
 
-  async getPendingTokens(req: Request, res: Response, next: NextFunction){
-    
-  }
-  async getRequests(req: Request, res: Response, next: NextFunction){
-
-  }
-  async getRejectedTokens(req: Request, res: Response, next: NextFunction){
-
-  }
-  async getCompletedTokens(req: Request, res: Response, next: NextFunction){
-
-  }
+  async getPendingTokens(req: Request, res: Response, next: NextFunction) {}
+  async getRequests(req: Request, res: Response, next: NextFunction) {}
+  async getRejectedTokens(req: Request, res: Response, next: NextFunction) {}
+  async getCompletedTokens(req: Request, res: Response, next: NextFunction) {}
 }
 
 export const clinicQueueController = new ClinicQueueController();
