@@ -15,11 +15,11 @@ import { jwtService } from "../../services/jsonWebToken.service";
 class ClinicController {
   async registerClinic(req: Request, res: Response, next: NextFunction) {
     try {
-      const { doctorName, authProvider, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth }: IClinicRegistrationDetails = req.body;
+      const { doctorName, authProvider, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth,pincode }: IClinicRegistrationDetails = req.body;
 
     
      const{subStartDate,subEndDate} =  clinicSubscriptionService.generateStartEndDate(1)
-
+  console.log(pincode)
       var userCredentials: IClinic = {
         doctorName,
         authProvider,
@@ -38,9 +38,11 @@ class ClinicController {
           type: "Point",
           coordinates: coordinates
         },
+        pincode,
         isSubscribed:true,
         subEndDate,
-        subStartDate
+        subStartDate,
+        hasClinicStarted:false,
       
       };
 
@@ -60,6 +62,7 @@ class ClinicController {
 
       return next(response);
     } catch (error) {
+      console.log(error)
       let response: IApiResponse = {
         status: 500
       };

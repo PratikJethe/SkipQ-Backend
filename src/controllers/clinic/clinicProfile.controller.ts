@@ -12,86 +12,11 @@ import { apiResponseService } from "../../services/apiResponse.service";
 import { jwtService } from "../../services/jsonWebToken.service";
 
 class ClinicProfileController {
-  async updateClinicProfile(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { doctorName, authProvider, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth }: IClinicRegistrationDetails = req.body;
+    
+  async searchClinic(text:string){
 
-      var userCredentials: IClinic = {
-        doctorName,
-        authProvider,
-        fcm,
-        isVerified: false,
-        address,
-        apartment,
-        gender,
-        phoneNo,
-        email,
-        profilePicUrl,
-        dateOfBirth,
-        clinicName,
-        speciality,
-        geometry: {
-          type: "Point",
-          coordinates: coordinates
-        }
-      };
-
-      const clinic: IClinicModel = await clinicDao.register(userCredentials);
-
-      let response: IApiResponse = {
-        status: 200,
-        data: clinic
-      };
-
-      const token = jwtService.createJwt({ id: clinic._id }, 2629746);
-
-      res.cookie("token", token, {
-        maxAge: 2592000000,
-        httpOnly: true
-      });
-
-      return next(response);
-    } catch (error) {
-      let response: IApiResponse = {
-        status: 500
-      };
-      return next(response);
-    }
   }
 
-  async phoneLogin(req: Request, res: Response, next: NextFunction) {
-    const { phoneNo } = req.body; //verify firebase id
-    try {
-      const clinic: IClinicModel | null = await clinicDao.findByNumber(phoneNo);
-
-      if (!clinic) {
-        let response: IApiResponse = {
-          status: 404,
-          errorMsg: "clinic not found"
-        };
-
-        return next(response);
-      }
-      const response: IApiResponse = {
-        data: clinic,
-        status: 200
-      };
-
-      const token = jwtService.createJwt({ id: clinic._id }, 2629746);
-
-      res.cookie("token", token, {
-        maxAge: 2592000000,
-        httpOnly: true
-      });
-
-      return next(response);
-    } catch (error) {
-      let response: IApiResponse = {
-        status: 500
-      };
-      return next(response);
-    }
-  }
 }
 
 export default new ClinicProfileController();

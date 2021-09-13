@@ -16,6 +16,7 @@ export interface IClinic{
   authProvider: authProviderEnum;
   apartment?: string;
   address: string;
+  pincode:number;
   email?: string;
   geometry: {
     type: string;
@@ -29,7 +30,8 @@ export interface IClinic{
   isVerified:boolean,
   isSubscribed:boolean,
   subStartDate:string,
-  subEndDate:string
+  subEndDate:string,
+  hasClinicStarted:boolean,
 }
 
 
@@ -48,5 +50,6 @@ export interface IClinicRegistrationDetails {
   dateOfBirth?: string;
   profilePicUrl?: string;
   speciality:string[];
+  pincode:number;
 }
 
