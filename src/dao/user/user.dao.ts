@@ -1,6 +1,7 @@
 import { Mongoose } from "mongoose";
-import { IUser, IUserModel,  } from "../../interfaces/user/user.interface";
+import { IFcmUserTokenModel, IUser, IUserModel,  } from "../../interfaces/user/user.interface";
 import { UserModel } from "../../models/user/user.model";
+import { FcmUserModel } from "../../models/user/userFcmToken.model";
 class UserDao {
   async register(userCredentials: IUser): Promise<IUserModel> {
     console.log("creds", userCredentials);
@@ -9,7 +10,7 @@ class UserDao {
   }
 
   async findByNumber(phoneNo: number): Promise<IUserModel | null> {
-    const user: IUserModel | null = await UserModel.findOne({ phoneNo: phoneNo });
+    const user: IUserModel | null = await UserModel.findOne({ 'contact.phoneNo': phoneNo });
 
     return user;
   }
@@ -21,6 +22,10 @@ class UserDao {
   async findByEmail(email: string): Promise<IUserModel | null> {
     const user: IUserModel | null = await UserModel.findOne({ email:email});
     return user;
+  }
+  async saveFcm(fcm: string,id:any): Promise<IFcmUserTokenModel | null> {
+    const savedFcm: IFcmUserTokenModel | null = await new FcmUserModel({userId:id,fcm:fcm}).save()
+    return savedFcm;
   }
 
 }

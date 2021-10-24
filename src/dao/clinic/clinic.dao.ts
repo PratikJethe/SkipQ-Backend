@@ -10,7 +10,7 @@ class ClinicDao {
   }
 
   async findByNumber(phoneNo: number): Promise<IClinicModel | null> {
-    const clinic: IClinicModel | null = await ClinicModel.findOne({ phoneNo: phoneNo });
+    const clinic: IClinicModel | null = await ClinicModel.findOne({ 'contact.phoneNo': phoneNo });
 
     return clinic;
   }

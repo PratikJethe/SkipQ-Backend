@@ -12,7 +12,7 @@ class UserService {
 
   async checkIfEmailorPhoneExist(phoneNo: number, email?: string): Promise<boolean> {
     if (email) {
-      const userByEmail: IUserModel | null = await userDao.findByEmail(email);
+      const userByEmail: IUserModel | null = await userDao.findByEmail(email.toLowerCase());
       if (userByEmail) {
         return true;
       }

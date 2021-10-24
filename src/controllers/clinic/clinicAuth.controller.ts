@@ -1,7 +1,7 @@
 import { error } from "console";
 import { NextFunction, Request, Response } from "express";
 import { request } from "http";
-import { genderEnum } from "../../constants/enums";
+import { authProviderEnum, genderEnum } from "../../constants/enums";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
 import clinicDao from "../../dao/clinic/clinic.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
@@ -15,35 +15,39 @@ import { jwtService } from "../../services/jsonWebToken.service";
 class ClinicController {
   async registerClinic(req: Request, res: Response, next: NextFunction) {
     try {
-      const { doctorName, authProvider, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth,pincode }: IClinicRegistrationDetails = req.body;
+      const { doctorName, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth, pincode, city }: IClinicRegistrationDetails = req.body;
 
-    
-     const{subStartDate,subEndDate} =  clinicSubscriptionService.generateStartEndDate(1)
-  console.log(pincode)
+      const { subStartDate, subEndDate } = clinicSubscriptionService.generateStartEndDate(1);
+      console.log(pincode);
       var userCredentials: IClinic = {
         doctorName,
-        authProvider,
+        authProvider: authProviderEnum.PHONE,
         fcm,
         isVerified: false,
-        address,
-        apartment,
+        address: {
+          address: address,
+          city: city,
+          pincode: pincode,
+          geometry: {
+            type: "Point",
+            coordinates: coordinates
+          },
+          apartment
+        },
+        contact:{
+          phoneNo:phoneNo,
+          dialCode:91  //hardcoded for india, if changed also include an validation
+        },
         gender,
-        phoneNo,
-        email,
+        email:email?.toLowerCase(),
         profilePicUrl,
         dateOfBirth,
         clinicName,
         speciality,
-        geometry: {
-          type: "Point",
-          coordinates: coordinates
-        },
-        pincode,
-        isSubscribed:true,
+        isSubscribed: true,
         subEndDate,
         subStartDate,
-        hasClinicStarted:false,
-      
+        hasClinicStarted: false
       };
 
       const clinic: IClinicModel = await clinicDao.register(userCredentials);
@@ -62,7 +66,7 @@ class ClinicController {
 
       return next(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       let response: IApiResponse = {
         status: 500
       };
@@ -71,6 +75,7 @@ class ClinicController {
   }
 
   async phoneLogin(req: Request, res: Response, next: NextFunction) {
+    console.log('called')
     const { phoneNo } = req.body; //verify firebase id
     try {
       const clinic: IClinicModel | null = await clinicDao.findByNumber(phoneNo);
@@ -103,8 +108,6 @@ class ClinicController {
       return next(response);
     }
   }
-
-  
 }
 
 export default new ClinicController();

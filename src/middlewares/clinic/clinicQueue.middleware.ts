@@ -3,6 +3,7 @@ import { nextTick } from "process";
 import { TokenStatusEnum } from "../../constants/enums/clinic.enum";
 import clinicQueueDao from "../../dao/clinic/clinicQueue.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
+import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
 import { apiResponseService } from "../../services/apiResponse.service";
 
 
@@ -10,12 +11,12 @@ import { apiResponseService } from "../../services/apiResponse.service";
 export async function checkIfUserHasToken(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.client.id;
-    const userToken = await clinicQueueDao.getReqPendTokenForUserId(userId);
+    const userToken = await clinicQueueDao.getTokenForRequiredStatusbyUserId(userId,[TokenStatusEnum.REQUESTED,TokenStatusEnum.PENDING_TOKEN]);
 
     if (userToken.length != 0) {
       let response: IApiResponse = {
         status: 400,
-        errorMsg: "user already has a token requested/pending"
+        errorMsg: "you already have a token requested or pending"
       };
 
       console.log(userToken);
@@ -86,6 +87,30 @@ export async function checkIfTokenExistForClinic(req: Request, res: Response, ne
 
 
     req.clinictoken = userToken
+    next();
+  } catch (error) {
+      console.log(error)
+    let response: IApiResponse = {
+      status: 500
+    };
+
+    return apiResponseService.responseHandler(response, req, res, next);
+  }
+}
+export async function hasClinicStarted(req: Request, res: Response, next: NextFunction) {
+  try {
+    const clinic:IClinicModel = req.clinic
+    if (!clinic.hasClinicStarted) {
+      let response: IApiResponse = {
+        status: 400,
+        errorMsg: "Clinic not opened"
+      };
+
+
+      return apiResponseService.responseHandler(response, req, res, next);
+    }
+
+
     next();
   } catch (error) {
       console.log(error)

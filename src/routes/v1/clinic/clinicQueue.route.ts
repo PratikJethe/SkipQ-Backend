@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { clinicQueueController } from "../../../controllers/clinic/clinicQueue.controller";
 import { getClinicByIdFromBody, getClinicByIdFromToken } from "../../../middlewares/clinic/clinic.middleware";
-import { checkIfTokenExistForClinic, checkIfTokenExistForUser, checkIfUserHasToken } from "../../../middlewares/clinic/clinicQueue.middleware";
+import { checkIfTokenExistForClinic, checkIfTokenExistForUser, checkIfUserHasToken, hasClinicStarted } from "../../../middlewares/clinic/clinicQueue.middleware";
 import { validationError } from "../../../middlewares/request";
 import { authMiddleware } from "../../../middlewares/request/authentication.middleware";
 import { getUserByIdFromToken } from "../../../middlewares/user/user.middleware";
@@ -19,7 +19,7 @@ router.use([authMiddleware]);
 //user actions
 router.put("/start-clinic",[getClinicByIdFromToken],clinicQueueController.startClinic);
 router.put("/stop-clinic",[getClinicByIdFromToken],clinicQueueController.stopClinic);   
-router.post("/request-token", [...onlineTokenCreateValidation, validationError, getClinicByIdFromBody, getUserByIdFromToken, checkIfUserHasToken], clinicQueueController.requestToken);
+router.post("/request-token", [...onlineTokenCreateValidation, validationError, getClinicByIdFromBody,hasClinicStarted, getUserByIdFromToken, checkIfUserHasToken], clinicQueueController.requestToken);
 router.post("/cancel-token", commonMiddleWareForUserActions, clinicQueueController.cancelTokne);
 router.post("/cancel-request", commonMiddleWareForUserActions, clinicQueueController.cancelRequest);
 
@@ -30,6 +30,6 @@ router.post("/reject-token", commonMiddleWareForDoctorActions, clinicQueueContro
 router.post("/complete-token", commonMiddleWareForDoctorActions, clinicQueueController.completeToken);
 
 //
-router.post("/create-offline-token", [...offlineTokenCreateValidation, validationError, getClinicByIdFromToken], clinicQueueController.createOfflineToken);
+router.post("/create-offline-token", [...offlineTokenCreateValidation, validationError, getClinicByIdFromToken,hasClinicStarted], clinicQueueController.createOfflineToken);
 
 export default router;

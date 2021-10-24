@@ -44,6 +44,13 @@ class ClinicQueueService {
     const fetchedTokens: IClinicQueueModel[] = await clinicQueueDao.getTokensForRequiredStatus(clinicId, TokenStatusEnum.PENDING_TOKEN);
     return fetchedTokens;
   }
+
+  async getTokenForRequiredStatusByClinicId(clinicId:string,listOfStatus:TokenStatusEnum[]):Promise<IClinicQueueModel[]>{
+    const tokens :IClinicQueueModel[]= await clinicQueueDao.getTokenForRequiredStatusByClinicId( clinicId,listOfStatus)
+    return tokens
+  }
+
+
 }
 
 export const clinicQueueService = new ClinicQueueService();

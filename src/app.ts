@@ -48,4 +48,4 @@ app.use(async (response: IApiResponse, req: Request, res: Response, next: NextFu
   apiResponseService.responseHandler(response, req, res, next);
 });
 
-app.listen(3000, "192.168.0.106", () => console.log("running"));
+app.listen(3000, "192.168.0.105", () => console.log("running"));

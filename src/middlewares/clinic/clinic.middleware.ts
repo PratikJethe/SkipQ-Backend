@@ -8,7 +8,7 @@ import { jwtService } from "../../services/jsonWebToken.service";
 export async function getClinicByIdFromToken(req: Request, res: Response, next: NextFunction) {
   try {
     const clinic: IClinicModel | null = await clinicService.getClinicById(req.client.id);
-
+console.log(req.client.id)
     if (!clinic) {
       let response: IApiResponse = {
         status: 404,
@@ -63,7 +63,7 @@ export async function checkIfClinicEmailOrPhoneExist(req: Request, res: Response
     if (clinicExist) {
       let response: IApiResponse = {
         status: 400,
-        errorMsg: "Email or Phone number already registered"
+        errorMsg: "Email already registered"
       };
 
       return apiResponseService.responseHandler(response, req, res, next);

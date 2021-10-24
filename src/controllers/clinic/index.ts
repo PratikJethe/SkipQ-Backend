@@ -1,3 +1,3 @@
 import clinicAuthController from "./clinicAuth.controller";
-
-export {clinicAuthController}
+ import clinicProfileController from "./clinicProfile.controller";
+export {clinicAuthController,clinicProfileController}

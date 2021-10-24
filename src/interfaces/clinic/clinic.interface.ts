@@ -8,20 +8,31 @@ export interface IClinicModel extends IClinic,Document{
   updatedAt?:string
 }
 
-//basic schema for clinic
-export interface IClinic{
-  doctorName: string;
-  phoneNo: number;
-  clinicName:String;
-  authProvider: authProviderEnum;
-  apartment?: string;
-  address: string;
-  pincode:number;
-  email?: string;
+export interface IClinicAddress {
+  address:string,
+  pincode:number,
   geometry: {
     type: string;
     coordinates: number[];
-  };
+  },
+  city:string,
+  apartment?:string,
+
+}
+
+export interface IClinicContact{
+phoneNo:number,
+dialCode:number
+}
+
+//basic schema for clinic
+export interface IClinic{
+  doctorName: string;
+  clinicName:String;
+  authProvider: authProviderEnum;
+  email?: string;
+  contact:IClinicContact;
+  address:IClinicAddress
   gender?: genderEnum;
   fcm: string;
   dateOfBirth?: string;
@@ -40,7 +51,6 @@ export interface IClinicRegistrationDetails {
   doctorName: string;
   phoneNo: number;
   clinicName:string;
-  authProvider: authProviderEnum;
   apartment?: string;
   address: string;
   email?: string;
@@ -51,5 +61,20 @@ export interface IClinicRegistrationDetails {
   profilePicUrl?: string;
   speciality:string[];
   pincode:number;
+  city:string;
+
 }
+
+
+export interface IClinicUpdate {
+  doctorName: string;
+  clinicName:String;
+  address:IClinicAddress
+  gender?: genderEnum;
+  dateOfBirth?: string;
+  profilePicUrl?: string;
+  speciality:string[],
+  
+}
+
 

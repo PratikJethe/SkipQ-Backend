@@ -39,7 +39,7 @@ export async function checkIfUserEmailOrPhoneExist(req: Request, res: Response, 
     if (userExist) {
       let response: IApiResponse = {
         status: 400,
-        errorMsg: "Email or Phone number already registered"
+        errorMsg: "Email already registered"
       };
 
       return apiResponseService.responseHandler(response, req, res, next);

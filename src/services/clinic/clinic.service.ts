@@ -10,7 +10,7 @@ class ClinicService {
 
   async checkIfEmailorPhoneExist(phoneNo: number, email?: string): Promise<boolean> {
     if (email) {
-      const clinicByEmail: IClinicModel | null = await clinicDao.findByEmail(email);
+      const clinicByEmail: IClinicModel | null = await clinicDao.findByEmail(email.toLowerCase());
       if (clinicByEmail) {
         return true;
       }

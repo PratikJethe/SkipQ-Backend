@@ -1,32 +1,41 @@
-import mongoose,{ Mongoose, ObjectId } from "mongoose";
+import mongoose, { Mongoose, ObjectId, PopulatedDoc } from "mongoose";
 import { authProviderEnum, genderEnum } from "../../constants/enums";
 
-export interface IUserModel extends IUser,mongoose.Document  {
-  createdAt?:string,
-  updatedAt?:string,
-}
-
-export interface IUser {
-  fullName: string;
-  phoneNo: number;
-  authProvider: authProviderEnum;
-  apartment?: string;
+export interface IUserAddress {
   address?: string;
-  email?: string;
+  apartment?: String;
   geometry?: {
     type?: string;
     coordinates?: number[];
   };
+  pincode?: number;
+  city?: string;
+}
+export interface IUserPhone {
+  phoneNo: number;
+  dialCode: number;
+}
+
+export interface IUserModel extends IUser, mongoose.Document {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IUser {
+  fullName: string;
+  authProvider: authProviderEnum;
+  address?: IUserAddress;
+  email?: string;
   gender?: genderEnum;
   fcm: string;
   dateOfBirth?: string;
   profilePicUrl?: string;
+  contact: IUserPhone;
 }
 
 export interface IUserRegistrationDetails {
   fullName: string;
   phoneNo: number;
-  authProvider: authProviderEnum;
   apartment?: string;
   address?: string;
   email?: string;
@@ -35,4 +44,14 @@ export interface IUserRegistrationDetails {
   fcm: string;
   dateOfBirth?: string;
   profilePicUrl?: string;
+  pincode?: number;
+  dialCode: number;
+  city: string;
+}
+
+export interface IFcmUserTokenModel extends Document {
+  userId: PopulatedDoc<IUserModel>;
+  fcm: String;
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -2,6 +2,27 @@ import { Mongoose, Schema, model, Model } from "mongoose";
 import { authProviderEnum } from "../../constants/enums/authProvider.enum";
 import { IClinic, IClinicModel } from "../../interfaces/clinic/clinic.interface";
 import { doctorSpecialty } from "../../constants/clinic";
+const clinicAddressSchema = new Schema({
+  address: { type: String, required: true },
+  apartment: { type: String },
+  geometry: {
+    type: { type: String },
+    coordinates: { type: [Number], requied: true }
+  },
+  pincode: {
+    type: Number,
+    required: false
+  },
+  city: {
+    type: String,
+    required: true
+  }
+});
+const clinicContactSchema = new Schema({
+  phoneNo: { type: Number, required: true, unique: true },
+  dialCode: { type: Number, required: true }
+});
+
 const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
   {
     doctorName: {
@@ -12,35 +33,9 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
       type: String,
       required: true
     },
-    phoneNo: {
-      type: Number,
-      required: true,
-      unique: true
-    },
-    email: { type: String,unique:true },
-
-    authProvider: {
-      type: String,
-      required: true,
-      enum: authProviderEnum
-    },
-    apartment: {
-      type: String
-    },
-    address: {
-      type: String,
-      required: true
-    },
-    geometry: {
-      type: { type: String, required: true },
-      coordinates: [{ type: Number, required: true }]
-    },
-
-    pincode:{
-     type:Number,
-     required:true
-     
-    },
+    contact: clinicContactSchema,
+    address: clinicAddressSchema,
+    email: { type: String, unique: false, required: false },
 
     fcm: {
       type: String,
@@ -70,14 +65,14 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
       type: Date,
       required: true
     },
-    hasClinicStarted:{
-      type:Boolean,
-      default:false
+    hasClinicStarted: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }
 );
 
-ClinicSchema.index({doctorName:'text',clinicName:'text',apartment:'text',address:'text',speciality:'text',pincode:"text"});
+ClinicSchema.index({ doctorName: "text", clinicName: "text", apartment: "text", address: "text", speciality: "text", pincode: "text" });
 ClinicSchema.index({ geometry: "2dsphere" });
 export const ClinicModel: Model<IClinicModel> = model<IClinicModel>("clinic", ClinicSchema);

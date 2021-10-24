@@ -20,9 +20,16 @@ class ClinicQueueDao {
     return token;
   }
 
-  async getReqPendTokenForUserId(userId: string): Promise<IClinicQueueModel[]> {
+  async getTokenForRequiredStatusbyUserId(userId: string, listOfStatus: TokenStatusEnum[]): Promise<IClinicQueueModel[]> {
     const userToken: IClinicQueueModel[] = await ClinicQueueModel.find({
-      $and: [{ userId: userId }, { tokenStatus: { $in: [TokenStatusEnum.REQUESTED, TokenStatusEnum.PENDING_TOKEN] } }]
+      $and: [{ userId: userId }, { tokenStatus: { $in: listOfStatus } }]
+    });
+
+    return userToken;
+  }
+  async getTokenForRequiredStatusByClinicId(clinicId: string, listOfStatus: TokenStatusEnum[]): Promise<IClinicQueueModel[]> {
+    const userToken: IClinicQueueModel[] = await ClinicQueueModel.find({
+      $and: [{ clinicId: clinicId }, { tokenStatus: { $in: listOfStatus } }]
     });
 
     return userToken;
