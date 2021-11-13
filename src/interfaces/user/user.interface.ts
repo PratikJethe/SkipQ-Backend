@@ -8,7 +8,7 @@ export interface IUserAddress {
     type?: string;
     coordinates?: number[];
   };
-  pincode?: number;
+  pincode?: string;
   city?: string;
 }
 export interface IUserPhone {
@@ -44,7 +44,7 @@ export interface IUserRegistrationDetails {
   fcm: string;
   dateOfBirth?: string;
   profilePicUrl?: string;
-  pincode?: number;
+  pincode?: string;
   dialCode: number;
   city: string;
 }

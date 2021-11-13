@@ -5,7 +5,7 @@ import { authProviderEnum, genderEnum } from "../../constants/enums";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
 import clinicDao from "../../dao/clinic/clinic.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
-import { IClinic, IClinicModel, IClinicRegistrationDetails } from "../../interfaces/clinic/clinic.interface";
+import { IClinic, IClinicModel, IClinicRegistrationDetails, IFcmClinicTokenModel } from "../../interfaces/clinic/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
 
 import { apiResponseService } from "../../services/apiResponse.service";
@@ -34,12 +34,12 @@ class ClinicController {
           },
           apartment
         },
-        contact:{
-          phoneNo:phoneNo,
-          dialCode:91  //hardcoded for india, if changed also include an validation
+        contact: {
+          phoneNo: phoneNo,
+          dialCode: 91 //hardcoded for india, if changed also include an validation
         },
         gender,
-        email:email?.toLowerCase(),
+        email: email?.toLowerCase(),
         profilePicUrl,
         dateOfBirth,
         clinicName,
@@ -51,6 +51,9 @@ class ClinicController {
       };
 
       const clinic: IClinicModel = await clinicDao.register(userCredentials);
+
+      console.log(clinic.id);
+      const saveFcm: IFcmClinicTokenModel | null = await clinicDao.saveFcm(fcm, clinic.id);
 
       let response: IApiResponse = {
         status: 200,
@@ -75,8 +78,8 @@ class ClinicController {
   }
 
   async phoneLogin(req: Request, res: Response, next: NextFunction) {
-    console.log('called')
-    const { phoneNo } = req.body; //verify firebase id
+    console.log("called");
+    const { phoneNo, fcm, uid } = req.body; //verify firebase id
     try {
       const clinic: IClinicModel | null = await clinicDao.findByNumber(phoneNo);
 
@@ -85,9 +88,11 @@ class ClinicController {
           status: 404,
           errorMsg: "clinic not found"
         };
-
+        
         return next(response);
       }
+      
+      const saveFcm: IFcmClinicTokenModel | null = await clinicDao.saveFcm(fcm, clinic.id);
       const response: IApiResponse = {
         data: clinic,
         status: 200
@@ -97,6 +102,42 @@ class ClinicController {
 
       res.cookie("token", token, {
         maxAge: 2592000000,
+        httpOnly: true
+      });
+
+      return next(response);
+    } catch (error) {
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
+  async getCliicById(req: Request, res: Response, next: NextFunction) {
+    //verify firebase id
+    try {
+      const clinic: IClinicModel | null = await clinicDao.findById(req.client.id);
+
+      if (!clinic) {
+        let response: IApiResponse = {
+          status: 404,
+          errorMsg: "clinic not found"
+        };
+
+        return next(response);
+      }
+      console.log(clinic);
+
+      const response: IApiResponse = {
+        data: clinic,
+        status: 200
+      };
+
+      const token = jwtService.createJwt({ id: clinic._id }, 2629746);
+
+      res.cookie("token", token, {
+        maxAge: 2592000000, //30 days in miliseconds
+        // maxAge: 600, //  60 sec for test
         httpOnly: true
       });
 

@@ -7,8 +7,11 @@ import { IApiResponse } from "./interfaces/apiResponse.interface";
 import clinicRoutes from "./routes/v1/clinic";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { clinicSubscriptionService } from "./services/clinic/clinicSubscription.service";
+import { ClinicModel } from "./models/clinic/clinic.model";
 const app: Application = express();
+
+
+
 
 mongoConnect()
   .then(() => {
@@ -48,4 +51,4 @@ app.use(async (response: IApiResponse, req: Request, res: Response, next: NextFu
   apiResponseService.responseHandler(response, req, res, next);
 });
 
-app.listen(3000, "192.168.0.105", () => console.log("running"));
+app.listen(3000, "192.168.0.104", () => console.log("running"));

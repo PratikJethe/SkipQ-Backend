@@ -1,6 +1,7 @@
 import { Mongoose } from "mongoose";
-import { IClinic, IClinicModel, IClinicRegistrationDetails } from "../../interfaces/clinic/clinic.interface";
+import { IClinic, IClinicModel, IClinicRegistrationDetails, IFcmClinicTokenModel } from "../../interfaces/clinic/clinic.interface";
 import { ClinicModel } from "../../models/clinic/clinic.model";
+import { FcmClinicModel } from "../../models/clinic/clinicFcmTokenModel";
 
 class ClinicDao {
   async register(clinicCredentials: IClinic): Promise<IClinicModel> {
@@ -29,6 +30,11 @@ class ClinicDao {
     const clinic :  IClinicModel | null = await ClinicModel.findOneAndUpdate({ _id: id }, { $set: { hasClinicStarted: hasStarted } }, { new: true });
 
     return clinic
+  }
+
+  async saveFcm(fcm: string,id:any): Promise<IFcmClinicTokenModel | null> {
+    const savedFcm: IFcmClinicTokenModel | null = await new FcmClinicModel({clinicId:id,fcm:fcm}).save()
+    return savedFcm;
   }
 
   async searchDoctor(){

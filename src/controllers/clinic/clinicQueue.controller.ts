@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import mongoose, { Mongoose,startSession, } from "mongoose";
+import moment from "moment";
+import mongoose, { Mongoose, startSession } from "mongoose";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
 import clinicDao from "../../dao/clinic/clinic.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
@@ -10,6 +11,14 @@ import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.clinic.isSubscribed) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "you don't have an active subscription.please activate to use service"
+        };
+        return next(response);
+      }
+
       const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, true);
 
       if (!clinic) {
@@ -18,14 +27,6 @@ class ClinicQueueController {
         };
 
         return next(response);
-      }
-
-      if(!clinic.isSubscribed){
-        let response :IApiResponse ={
-          status:400,
-          errorMsg:"you don't have an active subscription.please activate to use service"
-        }
-       return next(response)
       }
 
       let response: IApiResponse = {
@@ -44,19 +45,16 @@ class ClinicQueueController {
     }
   }
 
-
-  
   async stopClinic(req: Request, res: Response, next: NextFunction) {
     try {
+      const tokens: IClinicQueueModel[] = await clinicQueueService.getTokenForRequiredStatusByClinicId(req.client.id, [TokenStatusEnum.PENDING_TOKEN, TokenStatusEnum.REQUESTED]);
 
-      const tokens:IClinicQueueModel[] = await clinicQueueService.getTokenForRequiredStatusByClinicId(req.client.id,[TokenStatusEnum.PENDING_TOKEN,TokenStatusEnum.REQUESTED])
-
-      if(tokens.length !=0){
-       let response :IApiResponse ={
-         status:400,
-         errorMsg:"you have pending tokens or requests. cant close clinic before finishing them"
-       }
-      return next(response)
+      if (tokens.length != 0) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "you have pending tokens or requests. cant close clinic before finishing them"
+        };
+        return next(response);
       }
 
       const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, false);
@@ -88,23 +86,21 @@ class ClinicQueueController {
   // Token Action By User
   async requestToken(req: Request, res: Response, next: NextFunction) {
     try {
-    //  if(!req.clinic.hasClinicStarted){
-    //   let response: IApiResponse = {
-    //     status: 400,
-    //     errorMsg:"clinic not started yet"
-    //   };
-    //   return next(response)
-    //  }
+      if (!req.clinic.hasClinicStarted) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "clinic not started yet"
+        };
+        return next(response);
+      }
 
-
-    if(!req.clinic.isSubscribed){
-      
-        let response :IApiResponse ={
-          status:400,
-          errorMsg:"clinic is out of service"
-        }
-        return next(response)
-    }
+      if (!req.clinic.isSubscribed) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "clinic is out of service"
+        };
+        return next(response);
+      }
 
       const token: IClinicQueue = {
         userId: req.user.id,
@@ -112,7 +108,7 @@ class ClinicQueueController {
         tokenStatus: TokenStatusEnum.REQUESTED,
         userType: UserTypeEnum.ONLINE
       };
-    
+
       const createdToken = await clinicQueueService.requestToken(token);
 
       let response: IApiResponse = {
@@ -135,6 +131,14 @@ class ClinicQueueController {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
 
+      if (clinicToken.tokenStatus != TokenStatusEnum.REQUESTED) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
       const updateToken: IClinicQueueModel | null = await clinicQueueService.cancelRequest(clinicToken.id);
 
       if (!updateToken) {
@@ -160,7 +164,15 @@ class ClinicQueueController {
   async acceptRequest(req: Request, res: Response, next: NextFunction) {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
-      
+
+      if (clinicToken.tokenStatus != TokenStatusEnum.REQUESTED) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
 
       const updateToken: IClinicQueueModel | null = await clinicQueueService.acceptRequest(clinicToken.id);
 
@@ -188,6 +200,15 @@ class ClinicQueueController {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
 
+      if (clinicToken.tokenStatus != TokenStatusEnum.REQUESTED) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
+
       const updateToken: IClinicQueueModel | null = await clinicQueueService.rejectRequest(clinicToken.id);
 
       if (!updateToken) {
@@ -214,6 +235,15 @@ class ClinicQueueController {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
 
+      if (clinicToken.tokenStatus != TokenStatusEnum.PENDING_TOKEN) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
+
       const updateToken: IClinicQueueModel | null = await clinicQueueService.completeToken(clinicToken.id);
 
       if (!updateToken) {
@@ -239,6 +269,14 @@ class ClinicQueueController {
   async rejectToken(req: Request, res: Response, next: NextFunction) {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
+      if (clinicToken.tokenStatus != TokenStatusEnum.PENDING_TOKEN) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
 
       const updateToken: IClinicQueueModel | null = await clinicQueueService.rejectToken(clinicToken.id);
 
@@ -266,6 +304,15 @@ class ClinicQueueController {
     try {
       const clinicToken: IClinicQueueModel = req.clinictoken;
 
+      if (clinicToken.tokenStatus != TokenStatusEnum.PENDING_TOKEN) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid token state"
+        };
+
+        return next(response);
+      }
+
       const updateToken: IClinicQueueModel | null = await clinicQueueService.cancelToken(clinicToken.id);
 
       if (!updateToken) {
@@ -291,6 +338,14 @@ class ClinicQueueController {
   async createOfflineToken(req: Request, res: Response, next: NextFunction) {
     const clinic: IClinicModel = req.clinic;
     try {
+      if (!req.clinic.hasClinicStarted) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "clinic not started yet"
+        };
+        return next(response);
+      }
+
       const token: IClinicQueue = {
         userId: mongoose.Types.ObjectId(),
         clinicId: req.clinic.id,

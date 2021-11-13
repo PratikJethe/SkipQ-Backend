@@ -39,7 +39,7 @@ class UserController {
           dialCode: 91 // hardcoded for india if removed add an validator also
         },
         gender,
-        email :email?.toLowerCase(),
+        email: email?.toLowerCase(),
         profilePicUrl,
         dateOfBirth
       };
@@ -99,8 +99,6 @@ class UserController {
         return next(response);
       }
 
-      
-
       const response: IApiResponse = {
         data: user,
         status: 200
@@ -146,8 +144,8 @@ class UserController {
       const token = jwtService.createJwt({ id: user._id }, 2629746);
 
       res.cookie("token", token, {
-        // maxAge: 2592000000, //30 days in miliseconds
-        maxAge: 600, //  60 sec for test
+        maxAge: 2592000000, //30 days in miliseconds
+        // maxAge: 600, //  60 sec for test
         httpOnly: true
       });
 

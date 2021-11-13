@@ -17,9 +17,9 @@ const commonMiddleWareForUserActions = [...onlineTokenUpdateValidation, validati
 router.use([authMiddleware]);
 
 //user actions
-router.put("/start-clinic",[getClinicByIdFromToken],clinicQueueController.startClinic);
-router.put("/stop-clinic",[getClinicByIdFromToken],clinicQueueController.stopClinic);   
-router.post("/request-token", [...onlineTokenCreateValidation, validationError, getClinicByIdFromBody,hasClinicStarted, getUserByIdFromToken, checkIfUserHasToken], clinicQueueController.requestToken);
+router.put("/start-clinic", [getClinicByIdFromToken], clinicQueueController.startClinic);
+router.put("/stop-clinic", [getClinicByIdFromToken], clinicQueueController.stopClinic);
+router.post("/request-token", [...onlineTokenCreateValidation, validationError, getClinicByIdFromBody, hasClinicStarted, getUserByIdFromToken, checkIfUserHasToken], clinicQueueController.requestToken);
 router.post("/cancel-token", commonMiddleWareForUserActions, clinicQueueController.cancelTokne);
 router.post("/cancel-request", commonMiddleWareForUserActions, clinicQueueController.cancelRequest);
 
@@ -30,6 +30,9 @@ router.post("/reject-token", commonMiddleWareForDoctorActions, clinicQueueContro
 router.post("/complete-token", commonMiddleWareForDoctorActions, clinicQueueController.completeToken);
 
 //
-router.post("/create-offline-token", [...offlineTokenCreateValidation, validationError, getClinicByIdFromToken,hasClinicStarted], clinicQueueController.createOfflineToken);
+router.post("/create-offline-token", [...offlineTokenCreateValidation, validationError, getClinicByIdFromToken, hasClinicStarted], 
+
+
+clinicQueueController.createOfflineToken);
 
 export default router;
