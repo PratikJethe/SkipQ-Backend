@@ -49,6 +49,10 @@ class ClinicQueueService {
     const tokens :IClinicQueueModel[]= await clinicQueueDao.getTokenForRequiredStatusByClinicId( clinicId,listOfStatus)
     return tokens
   }
+  async getTokenForRequiredStatusByUserId(userId:string,listOfStatus:TokenStatusEnum[]):Promise<IClinicQueueModel[]>{
+    const tokens :IClinicQueueModel[]= await clinicQueueDao.getTokenForRequiredStatusbyUserId( userId,listOfStatus)
+    return tokens
+  }
 
 
 }

@@ -40,6 +40,8 @@ app.use("/api/v1/clinic", clinicRoutes);
 
 //mismatched routes
 app.use("*", (req, res, next) => {
+console.log('not found')
+console.log(req.baseUrl);
   let response: IApiResponse = {
     status: 404,
     errorMsg: "route not found"

@@ -6,6 +6,8 @@ import clinicDao from "../../dao/clinic/clinic.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
 import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
+import { IUserModel } from "../../interfaces/user/user.interface";
+import { clinicService } from "../../services/clinic/clinic.service";
 import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
 
 class ClinicQueueController {
@@ -85,6 +87,8 @@ class ClinicQueueController {
 
   // Token Action By User
   async requestToken(req: Request, res: Response, next: NextFunction) {
+
+    console.log('here');
     try {
       if (!req.clinic.hasClinicStarted) {
         let response: IApiResponse = {
@@ -110,6 +114,8 @@ class ClinicQueueController {
       };
 
       const createdToken = await clinicQueueService.requestToken(token);
+
+     await  createdToken.populate('userId').populate('clinicId').execPopulate()
 
       let response: IApiResponse = {
         status: 200,
@@ -377,7 +383,46 @@ class ClinicQueueController {
     }
   }
 
-  async getPendingTokens(req: Request, res: Response, next: NextFunction) {}
+  async getUserTokens(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user: IUserModel = req.user;
+      const tokens: IClinicQueueModel[] = await clinicQueueService.getTokenForRequiredStatusByUserId(user.id, [TokenStatusEnum.REQUESTED, TokenStatusEnum.PENDING_TOKEN]);
+
+      let response: IApiResponse = {
+        status: 200,
+        data: tokens
+      };
+
+      return next(response);
+    } catch (error) {
+      console.log(error);
+
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
+  async getPendingTokens(req: Request, res: Response, next: NextFunction) {
+    try {
+      const clinic: IClinicModel = req.clinic;
+      const pendindTokens: IClinicQueueModel[] = await clinicQueueService.getPendingTokens(clinic.id);
+
+      let response: IApiResponse = {
+        status: 200,
+        data: pendindTokens
+      };
+
+      return next(response);
+    } catch (error) {
+      console.log(error);
+
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
   async getRequests(req: Request, res: Response, next: NextFunction) {}
   async getRejectedTokens(req: Request, res: Response, next: NextFunction) {}
   async getCompletedTokens(req: Request, res: Response, next: NextFunction) {}

@@ -10,12 +10,14 @@ class ClinicQueueDao {
     return createdToken;
   }
   async updateTokenStatus(tokenId: string, tokenStatus: TokenStatusEnum): Promise<IClinicQueueModel | null> {
-    const createdToken: IClinicQueueModel | null = await ClinicQueueModel.findOneAndUpdate({ _id: tokenId }, { $set: { tokenStatus: tokenStatus } }, { new: true });
+    const createdToken: IClinicQueueModel | null = await ClinicQueueModel.findOneAndUpdate({ _id: tokenId }, { $set: { tokenStatus: tokenStatus } }, { new: true })
+      .populate("userId")
+      .populate("clinicId");
 
     return createdToken;
   }
   async getTokenById(tokenId: string): Promise<IClinicQueueModel | null> {
-    const token: IClinicQueueModel | null = await ClinicQueueModel.findById(tokenId);
+    const token: IClinicQueueModel | null = await ClinicQueueModel.findById(tokenId).populate("userId").populate("clinicId");
 
     return token;
   }
@@ -23,14 +25,18 @@ class ClinicQueueDao {
   async getTokenForRequiredStatusbyUserId(userId: string, listOfStatus: TokenStatusEnum[]): Promise<IClinicQueueModel[]> {
     const userToken: IClinicQueueModel[] = await ClinicQueueModel.find({
       $and: [{ userId: userId }, { tokenStatus: { $in: listOfStatus } }]
-    });
+    })
+      .populate("userId")
+      .populate("clinicId");
 
     return userToken;
   }
   async getTokenForRequiredStatusByClinicId(clinicId: string, listOfStatus: TokenStatusEnum[]): Promise<IClinicQueueModel[]> {
     const userToken: IClinicQueueModel[] = await ClinicQueueModel.find({
       $and: [{ clinicId: clinicId }, { tokenStatus: { $in: listOfStatus } }]
-    });
+    })
+      .populate("userId")
+      .populate("clinicId");
 
     return userToken;
   }
@@ -55,6 +61,7 @@ class ClinicQueueDao {
     const fetchedTokens: IClinicQueueModel[] = await ClinicQueueModel.find({
       $and: [{ clinicId: clinicId }, { tokenStatus: tokenStatus }]
     })
+      .sort({ updatedAt: 1 })
       .populate("userId")
       .populate("clinicId");
     return fetchedTokens;
