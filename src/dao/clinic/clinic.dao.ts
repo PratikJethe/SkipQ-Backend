@@ -11,12 +11,12 @@ class ClinicDao {
   }
 
   async findByNumber(phoneNo: number): Promise<IClinicModel | null> {
-    const clinic: IClinicModel | null = await ClinicModel.findOne({ 'contact.phoneNo': phoneNo });
+    const clinic: IClinicModel | null = await ClinicModel.findOne({ "contact.phoneNo": phoneNo });
 
     return clinic;
   }
   async findByEmail(email: string): Promise<IClinicModel | null> {
-    const clinic: IClinicModel | null = await ClinicModel.findOne({ email: email});
+    const clinic: IClinicModel | null = await ClinicModel.findOne({ email: email });
 
     return clinic;
   }
@@ -26,20 +26,29 @@ class ClinicDao {
     return clinic;
   }
 
-  async updateClinicStart(id:string,hasStarted:boolean): Promise<IClinicModel | null>{
-    const clinic :  IClinicModel | null = await ClinicModel.findOneAndUpdate({ _id: id }, { $set: { hasClinicStarted: hasStarted } }, { new: true });
+  async updateClinicStart(id: string, hasStarted: boolean): Promise<IClinicModel | null> {
+    const clinic: IClinicModel | null = await ClinicModel.findOneAndUpdate({ _id: id }, { $set: { hasClinicStarted: hasStarted } }, { new: true });
 
-    return clinic
+    return clinic;
   }
 
-  async saveFcm(fcm: string,id:any): Promise<IFcmClinicTokenModel | null> {
-    const savedFcm: IFcmClinicTokenModel | null = await new FcmClinicModel({clinicId:id,fcm:fcm}).save()
+  async saveFcm(fcm: string, id: any): Promise<IFcmClinicTokenModel | null> {
+    const savedFcm: IFcmClinicTokenModel | null = await new FcmClinicModel({ clinicId: id, fcm: fcm }).save();
     return savedFcm;
   }
 
-  async searchDoctor(){
-    const clinic = ClinicModel.aggregate([
-    ])
+  async getFcmTokens(id: any): Promise<IFcmClinicTokenModel[]> {
+    const fcmTokenList: IFcmClinicTokenModel[] = await FcmClinicModel.find({
+      clinicId: id
+    })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return fcmTokenList;
+  }
+
+  async searchDoctor() {
+    const clinic = ClinicModel.aggregate([]);
   }
 }
 

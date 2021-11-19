@@ -56,6 +56,39 @@ export const userRegisterValidation = [
   //   return true
   // }
 ];
+export const userUpdateValidation = [
+  check("fullName", "fullName is required").exists({ checkFalsy: true }).isString().withMessage("Invalid fullname"),
+
+  check("apartment", "Invalid apartment value").optional().exists({ checkFalsy: true }).isString(),
+  check("city", "Invalid city value").optional().exists({ checkFalsy: true }).isString(),
+  check("address", "Invalid address value").optional().exists({ checkFalsy: true }).isString(),
+  check("gender", "Invalid gender value")
+    .optional()
+    .exists({ checkFalsy: true })
+    .isString()
+    .bail()
+    .custom((gender) => {
+      console.log(gender);
+      return Object.values(genderEnum).includes(gender);
+    }),
+  check("pincode", "Invalid pincode value")
+    .optional()
+    .exists({ checkFalsy: true })
+    .isString()
+    .withMessage("Invalid pincode")
+    .matches(/^[1-9][0-9]{5}$/)
+    .withMessage("Invalid 6 digit pincode"),
+  check("coordinates", "Invalid coordinates")
+    .optional()
+    .exists({ checkFalsy: true })
+    .isArray({ min: 2, max: 2 })
+    .bail()
+    .custom((coordinates) => {
+      console.log(coordinates);
+      return coordinates[0] >= -180 && coordinates[0] <= 180 && coordinates[1] >= -90 && coordinates[1] <= 90;
+    }),
+  check("dateOfBirth", "Invalid Date of birth").optional().exists({ checkFalsy: true }).bail().isString().bail().isISO8601()
+];
 export const phoneLoginValidation = [
   check("fcm", "fcm token required").exists({ checkFalsy: true }).bail().isString().withMessage("Invalid fcm token"),
   check("uid", "number not verified").exists({ checkFalsy: true }).bail().isString().withMessage("number not verified")

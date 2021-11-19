@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { pickBy } from "lodash";
 import moment from "moment";
 import mongoose, { Mongoose, startSession } from "mongoose";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
@@ -9,7 +10,6 @@ import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQ
 import { IUserModel } from "../../interfaces/user/user.interface";
 import { clinicService } from "../../services/clinic/clinic.service";
 import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
-
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
@@ -355,21 +355,24 @@ class ClinicQueueController {
       const token: IClinicQueue = {
         userId: mongoose.Types.ObjectId(),
         clinicId: req.clinic.id,
-        tokenStatus: TokenStatusEnum.REQUESTED,
+        tokenStatus: TokenStatusEnum.PENDING_TOKEN,
         userType: UserTypeEnum.OFFLINE,
         userName: req.body.userName
       };
 
-      const updateToken: IClinicQueueModel | null = await clinicQueueService.requestToken(token);
+      const createdToken: IClinicQueueModel | null = await clinicQueueService.requestToken(token);
 
-      if (!updateToken) {
+      await  createdToken.populate('userId').populate('clinicId').execPopulate()
+
+
+      if (!createdToken) {
         throw new Error("unknown error");
         return;
       }
 
       let response: IApiResponse = {
         status: 200,
-        data: updateToken
+        data: createdToken
       };
 
       return next(response);

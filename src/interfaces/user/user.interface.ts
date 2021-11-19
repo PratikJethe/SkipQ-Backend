@@ -1,5 +1,6 @@
 import mongoose, { Mongoose, ObjectId, PopulatedDoc } from "mongoose";
 import { authProviderEnum, genderEnum } from "../../constants/enums";
+import { ServiceType } from "../../constants/enums/general.enums";
 
 export interface IUserAddress {
   address?: string;
@@ -46,7 +47,7 @@ export interface IUserRegistrationDetails {
   profilePicUrl?: string;
   pincode?: string;
   dialCode: number;
-  city: string;
+  city?: string;
 }
 
 export interface IFcmUserTokenModel extends Document {
@@ -55,3 +56,28 @@ export interface IFcmUserTokenModel extends Document {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface IUserUpdate {
+  fullName: string;
+  address?: IUserAddress;
+  gender?: genderEnum;
+  dateOfBirth?: string;
+  profilePicUrl?: string;
+}
+
+// export interface IUserNotificationAndActivity extends Document {
+//   userId: PopulatedDoc<IUserModel>;
+//   isSeen: boolean;
+//   byAdmin?:boolean;
+//   diaplay?:boolean;
+//   notificationType:?
+//   isActivity?:boolean;
+//   forService?:boolean;
+//   serviceType?:ServiceType;
+//   serviceId?:any;
+//   titleText?:string;
+//   subtitleText?:string;
+
+//   updatedAt?:string;
+//   createdAt?:string;
+// }

@@ -17,6 +17,8 @@ export function validationError(
       status:400,
       errorMsg:errors.array()[0].msg,
     } 
+
+  console.log(errors);
     return apiResponseService.responseHandler(response,req,res,next)
   }
 

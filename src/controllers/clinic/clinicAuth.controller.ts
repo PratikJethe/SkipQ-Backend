@@ -88,10 +88,10 @@ class ClinicController {
           status: 404,
           errorMsg: "clinic not found"
         };
-        
+
         return next(response);
       }
-      
+
       const saveFcm: IFcmClinicTokenModel | null = await clinicDao.saveFcm(fcm, clinic.id);
       const response: IApiResponse = {
         data: clinic,
@@ -107,6 +107,7 @@ class ClinicController {
 
       return next(response);
     } catch (error) {
+      console.log(error)
       let response: IApiResponse = {
         status: 500
       };
