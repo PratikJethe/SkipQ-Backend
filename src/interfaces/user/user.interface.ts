@@ -4,7 +4,7 @@ import { ServiceType } from "../../constants/enums/general.enums";
 
 export interface IUserAddress {
   address?: string;
-  apartment?: String;
+  apartment?: string;
   geometry?: {
     type?: string;
     coordinates?: number[];
@@ -52,7 +52,7 @@ export interface IUserRegistrationDetails {
 
 export interface IFcmUserTokenModel extends Document {
   userId: PopulatedDoc<IUserModel>;
-  fcm: String;
+  fcm: string;
   createdAt?: string;
   updatedAt?: string;
 }

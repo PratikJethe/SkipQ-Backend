@@ -4,7 +4,7 @@ import { body, header } from "express-validator";
 const paytmchecksum = require("paytmchecksum");
 
 class PaytmService {
-  async generateTransactionToken(id: string, value: number, orderId: string) {
+  async generateTransactionToken(id: string, value: number, orderId: string, month: number) {
     interface LooseObject {
       [key: string]: any;
     }
@@ -15,9 +15,9 @@ class PaytmService {
       mid: "OdCdmt83472104874643",
       websiteName: "WEBSTAGING",
       orderId: orderId,
-      callbackUrl: "https://webhook.site/64c2017e-201c-46b0-a886-51812a4622fe",
+      callbackUrl: "https://webhook.site/6ff4ae54-b9bb-4ee4-9587-f965bb2c4f1e",
       txnAmount: {
-        value: "1.00",
+        value: (value * month).toString(),
         currency: "INR"
       },
       userInfo: {

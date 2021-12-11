@@ -7,7 +7,8 @@ const ClinicQueueSchema: Schema<IClinicQueueModel> = new Schema<IClinicQueueMode
     clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true },
     tokenStatus: { type: String, enum: TokenStatusEnum, required: true },
     userType: { type: String, enum: UserTypeEnum, required: true },
-    userName :{type:String,required:false}
+    userName :{type:String,required:false},
+    tokenNumber:{type:Number,required:false}
   },
 
   { timestamps: true }

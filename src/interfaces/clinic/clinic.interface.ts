@@ -81,7 +81,7 @@ export interface IClinicUpdate {
 
 export interface IFcmClinicTokenModel extends Document {
   clinicId: PopulatedDoc<IClinicModel>;
-  fcm: String;
+  fcm: string;
   createdAt?: string;
   updatedAt?: string;
 }

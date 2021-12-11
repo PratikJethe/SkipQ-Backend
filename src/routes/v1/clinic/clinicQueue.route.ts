@@ -23,8 +23,7 @@ router.post("/request-token", [...onlineTokenCreateValidation, validationError, 
 router.post("/cancel-token", commonMiddleWareForUserActions, clinicQueueController.cancelTokne);
 router.post("/cancel-request", commonMiddleWareForUserActions, clinicQueueController.cancelRequest);
 router.post("/create-offline-token", [...offlineTokenCreateValidation, validationError, getClinicByIdFromToken, hasClinicStarted], clinicQueueController.createOfflineToken);
-router.get("/get-user-tokens",[getUserByIdFromToken],clinicQueueController.getUserTokens,)
-
+router.get("/get-user-tokens", [getUserByIdFromToken], clinicQueueController.getUserTokens);
 
 //clinic actions for online user
 router.post("/accept-request", commonMiddleWareForDoctorActions, clinicQueueController.acceptRequest);
@@ -33,7 +32,7 @@ router.post("/reject-token", commonMiddleWareForDoctorActions, clinicQueueContro
 router.post("/complete-token", commonMiddleWareForDoctorActions, clinicQueueController.completeToken);
 
 //General
-router.get("/get-pending-tokens/:clinicId",getClinicByIdFromParams,clinicQueueController.getPendingTokens,)
-
+router.get("/get-pending-tokens/:clinicId", getClinicByIdFromParams, clinicQueueController.getPendingTokens);
+router.get("/get-requests", getClinicByIdFromToken, clinicQueueController.getRequests);
 
 export default router;

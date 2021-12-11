@@ -16,8 +16,8 @@ class ClinicQueueService {
     const updatedToken: IClinicQueueModel | null = await clinicQueueDao.updateTokenStatus(tokenId, TokenStatusEnum.CANCELLED_REQUESTED);
     return updatedToken;
   }
-  async acceptRequest(tokenId: string): Promise<IClinicQueueModel | null> {
-    const createdToken: IClinicQueueModel | null = await clinicQueueDao.updateTokenStatus(tokenId, TokenStatusEnum.PENDING_TOKEN);
+  async acceptRequest(tokenId: string,tokenNumber:number): Promise<IClinicQueueModel | null> {
+    const createdToken: IClinicQueueModel | null = await clinicQueueDao.updateTokenStatusWithTokenNumber(tokenId, TokenStatusEnum.PENDING_TOKEN,tokenNumber);
     return createdToken;
   }
   async rejectRequest(tokenId: string): Promise<IClinicQueueModel | null> {
@@ -41,7 +41,7 @@ class ClinicQueueService {
     return fetchedTokens;
   }
   async getRequests(clinicId: string): Promise<IClinicQueueModel[]> {
-    const fetchedTokens: IClinicQueueModel[] = await clinicQueueDao.getTokensForRequiredStatus(clinicId, TokenStatusEnum.PENDING_TOKEN);
+    const fetchedTokens: IClinicQueueModel[] = await clinicQueueDao.getTokensForRequiredStatus(clinicId, TokenStatusEnum.REQUESTED);
     return fetchedTokens;
   }
 

@@ -14,4 +14,5 @@ export interface IClinicQueue {
     tokenStatus:TokenStatusEnum
     userType:UserTypeEnum
     userName?:string
+    tokenNumber?:number
 }

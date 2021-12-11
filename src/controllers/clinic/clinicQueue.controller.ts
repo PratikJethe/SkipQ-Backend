@@ -4,16 +4,19 @@ import moment from "moment";
 import mongoose, { Mongoose, startSession } from "mongoose";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
 import clinicDao from "../../dao/clinic/clinic.dao";
+import userDao from "../../dao/user/user.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
 import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
 import { IUserModel } from "../../interfaces/user/user.interface";
 import { clinicService } from "../../services/clinic/clinic.service";
 import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
+import { fcmService } from "../../services/firebase/fcm.service";
+import { userService } from "../../services/user/user.service";
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!req.clinic.isSubscribed) {
+      if (!moment(req.clinic.subEndDate).isAfter(moment())) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "you don't have an active subscription.please activate to use service"
@@ -87,8 +90,7 @@ class ClinicQueueController {
 
   // Token Action By User
   async requestToken(req: Request, res: Response, next: NextFunction) {
-
-    console.log('here');
+    console.log("here");
     try {
       if (!req.clinic.hasClinicStarted) {
         let response: IApiResponse = {
@@ -98,7 +100,7 @@ class ClinicQueueController {
         return next(response);
       }
 
-      if (!req.clinic.isSubscribed) {
+      if (!moment(req.clinic.subEndDate).isAfter(moment())) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "clinic is out of service"
@@ -115,12 +117,21 @@ class ClinicQueueController {
 
       const createdToken = await clinicQueueService.requestToken(token);
 
-     await  createdToken.populate('userId').populate('clinicId').execPopulate()
+      await createdToken.populate("userId").populate("clinicId").execPopulate();
 
       let response: IApiResponse = {
         status: 200,
         data: createdToken
       };
+
+      const tokens = await clinicDao.getFcmTokens(req.clinic.id);
+
+      await fcmService.sendNotifications(
+        tokens.map((token) => token.fcm),
+        {
+          title: `${req.user.fullName} has requested for token`
+        }
+      );
 
       return next(response);
     } catch (error) {
@@ -180,7 +191,16 @@ class ClinicQueueController {
         return next(response);
       }
 
-      const updateToken: IClinicQueueModel | null = await clinicQueueService.acceptRequest(clinicToken.id);
+      let tokenNumber: number = 1;
+      const pendindTokens: IClinicQueueModel[] = await clinicQueueService.getPendingTokens(req.clinic.id);
+
+      if (pendindTokens.length != 0) {
+        tokenNumber = (pendindTokens[pendindTokens.length - 1].tokenNumber as any) + 1;
+      }
+
+      console.log("prev", clinicToken);
+      const updateToken: IClinicQueueModel | null = await clinicQueueService.acceptRequest(clinicToken.id, tokenNumber);
+      console.log("after", updateToken);
 
       if (!updateToken) {
         throw new Error("unknown error");
@@ -191,6 +211,8 @@ class ClinicQueueController {
         status: 200,
         data: updateToken
       };
+
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has accepted your token request` });
 
       return next(response);
     } catch (error) {
@@ -226,6 +248,7 @@ class ClinicQueueController {
         status: 200,
         data: updateToken
       };
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has rejected your token request` });
 
       return next(response);
     } catch (error) {
@@ -262,6 +285,11 @@ class ClinicQueueController {
         data: updateToken
       };
 
+      if (updateToken.userType == UserTypeEnum.ONLINE) {
+        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Hope you had good experience. get well soon!` });
+      }
+      await userService.sendTokenUpdateNotification(req.clinic.id);
+
       return next(response);
     } catch (error) {
       console.log(error);
@@ -295,6 +323,10 @@ class ClinicQueueController {
         status: 200,
         data: updateToken
       };
+      if (updateToken.userType == UserTypeEnum.ONLINE) {
+        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has rejected your token` });
+      }
+      await userService.sendTokenUpdateNotification(req.clinic.id);
 
       return next(response);
     } catch (error) {
@@ -331,6 +363,8 @@ class ClinicQueueController {
         data: updateToken
       };
 
+      await userService.sendTokenUpdateNotification(updateToken.clinicId.id);
+
       return next(response);
     } catch (error) {
       console.log(error);
@@ -351,19 +385,24 @@ class ClinicQueueController {
         };
         return next(response);
       }
+      let tokenNumber: number = 1;
+      const pendindTokens: IClinicQueueModel[] = await clinicQueueService.getPendingTokens(req.clinic.id);
 
+      if (pendindTokens.length != 0) {
+        tokenNumber = (pendindTokens[pendindTokens.length - 1].tokenNumber as any) + 1;
+      }
       const token: IClinicQueue = {
         userId: mongoose.Types.ObjectId(),
         clinicId: req.clinic.id,
         tokenStatus: TokenStatusEnum.PENDING_TOKEN,
         userType: UserTypeEnum.OFFLINE,
-        userName: req.body.userName
+        userName: req.body.userName,
+        tokenNumber: tokenNumber
       };
 
       const createdToken: IClinicQueueModel | null = await clinicQueueService.requestToken(token);
 
-      await  createdToken.populate('userId').populate('clinicId').execPopulate()
-
+      await createdToken.populate("userId").populate("clinicId").execPopulate();
 
       if (!createdToken) {
         throw new Error("unknown error");
@@ -426,7 +465,26 @@ class ClinicQueueController {
       return next(response);
     }
   }
-  async getRequests(req: Request, res: Response, next: NextFunction) {}
+  async getRequests(req: Request, res: Response, next: NextFunction) {
+    try {
+      const clinic: IClinicModel = req.clinic;
+      const pendindTokens: IClinicQueueModel[] = await clinicQueueService.getRequests(clinic.id);
+
+      let response: IApiResponse = {
+        status: 200,
+        data: pendindTokens
+      };
+
+      return next(response);
+    } catch (error) {
+      console.log(error);
+
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
   async getRejectedTokens(req: Request, res: Response, next: NextFunction) {}
   async getCompletedTokens(req: Request, res: Response, next: NextFunction) {}
 }

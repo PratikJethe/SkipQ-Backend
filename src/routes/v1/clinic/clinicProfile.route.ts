@@ -5,13 +5,13 @@ import { checkIfClinicEmailOrPhoneExist, getClinicByIdFromToken } from "../../..
 import { validationError } from "../../../middlewares/request";
 import { authMiddleware } from "../../../middlewares/request/authentication.middleware";
 import { getUserByIdFromToken } from "../../../middlewares/user/user.middleware";
-import { clinicRegisterValidation, clinicUpdateValidation } from "../../../validators/clinic/clinicRequest.validator";
+import { clinicRegisterValidation, clinicSerchValidation, clinicUpdateValidation } from "../../../validators/clinic/clinicRequest.validator";
 import { userRegisterValidation, phoneLoginValidation } from "../../../validators/user/userRequest.validator";
 
 const router = Router();
 
 router.use(authMiddleware);
-router.get("/search-by-keyword", [getUserByIdFromToken], clinicProfileController.searchClinicByKeyword);
+router.get("/search-by-keyword", [...clinicSerchValidation,validationError,getUserByIdFromToken], clinicProfileController.searchClinicByKeyword);
 router.post("/update-profile", [...clinicUpdateValidation, validationError, getClinicByIdFromToken], clinicProfileController.updateClinic);
 router.get("/:id", [getUserByIdFromToken], clinicProfileController.getClinicProfile);
 

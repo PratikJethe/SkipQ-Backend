@@ -1,5 +1,5 @@
 import { Mongoose } from "mongoose";
-import { IFcmUserTokenModel, IUser, IUserModel,  } from "../../interfaces/user/user.interface";
+import { IFcmUserTokenModel, IUser, IUserModel } from "../../interfaces/user/user.interface";
 import { UserModel } from "../../models/user/user.model";
 import { FcmUserModel } from "../../models/user/userFcmToken.model";
 class UserDao {
@@ -10,7 +10,7 @@ class UserDao {
   }
 
   async findByNumber(phoneNo: number): Promise<IUserModel | null> {
-    const user: IUserModel | null = await UserModel.findOne({ 'contact.phoneNo': phoneNo });
+    const user: IUserModel | null = await UserModel.findOne({ "contact.phoneNo": phoneNo });
 
     return user;
   }
@@ -20,14 +20,22 @@ class UserDao {
   }
 
   async findByEmail(email: string): Promise<IUserModel | null> {
-    const user: IUserModel | null = await UserModel.findOne({ email:email});
+    const user: IUserModel | null = await UserModel.findOne({ email: email });
     return user;
   }
-  async saveFcm(fcm: string,id:any): Promise<IFcmUserTokenModel | null> {
-    const savedFcm: IFcmUserTokenModel | null = await new FcmUserModel({userId:id,fcm:fcm}).save()
+  async saveFcm(fcm: string, id: any): Promise<IFcmUserTokenModel | null> {
+    const savedFcm: IFcmUserTokenModel | null = await new FcmUserModel({ userId: id, fcm: fcm }).save();
     return savedFcm;
   }
+  async getFcmTokens(id: any): Promise<IFcmUserTokenModel[]> {
+    const fcmTokenList: IFcmUserTokenModel[] = await FcmUserModel.find({
+      userId: id
+    })
+      .sort({ createdAt: -1 })
+      .limit(10);
 
+    return fcmTokenList;
+  }
 }
 
 export default new UserDao();

@@ -16,6 +16,13 @@ class ClinicQueueDao {
 
     return createdToken;
   }
+  async updateTokenStatusWithTokenNumber(tokenId: string, tokenStatus: TokenStatusEnum, tokenNumber: number): Promise<IClinicQueueModel | null> {
+    const createdToken: IClinicQueueModel | null = await ClinicQueueModel.findOneAndUpdate({ _id: tokenId }, { $set: { tokenStatus: tokenStatus, tokenNumber: tokenNumber } }, { new: true })
+      .populate("userId")
+      .populate("clinicId");
+
+    return createdToken;
+  }
   async getTokenById(tokenId: string): Promise<IClinicQueueModel | null> {
     const token: IClinicQueueModel | null = await ClinicQueueModel.findById(tokenId).populate("userId").populate("clinicId");
 

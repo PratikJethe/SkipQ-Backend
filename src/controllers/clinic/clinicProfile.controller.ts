@@ -50,27 +50,34 @@ class ClinicProfileController {
     }
   }
   async searchClinicByKeyword(req: Request, res: Response, next: NextFunction) {
-    console.log('here')
+    console.log("here");
     try {
       const keyword = req.query.keyword;
+      const pageNo = parseInt(req.query.pageNo as string);
 
-      if (keyword == undefined || typeof keyword != "string") {
-        let response: IApiResponse = {
-          status: 400,
-          errorMsg: "Invalid search query"
-        };
+      // console.log(pageNo);
+      // console.log(typeof pageNo);
 
-        return next(response);
-      }
+      // if (keyword == undefined || typeof keyword != "string" || pageNo || typeof pageNo != "number") {
+      //   let response: IApiResponse = {
+      //     status: 400,
+      //     errorMsg: "Invalid search query"
+      //   };
 
-      const searchedClinic: IClinicModel[] = await clinicProfileDao.searchClinicByKeyword(keyword);
+      //   return next(response);
+      // }
+
+      const searchedClinic: IClinicModel[] = await clinicProfileDao.searchClinicByKeyword(keyword as string, pageNo);
 
       let response: IApiResponse = {
         status: 200,
         data: searchedClinic
       };
 
-      return next(response);
+      setTimeout((() => {
+        return next(response);
+      }), 4000)
+
     } catch (error) {
       console.log(error);
       let response: IApiResponse = {

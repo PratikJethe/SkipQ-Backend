@@ -1,4 +1,4 @@
-import { check } from "express-validator";
+import { check, query } from "express-validator";
 import { doctorSpecialty } from "../../constants/clinic";
 import { authProviderEnum, genderEnum } from "../../constants/enums";
 
@@ -10,7 +10,8 @@ export const clinicRegisterValidation = [
   check("uid", "number not verified").exists({ checkFalsy: true }).bail().isString().withMessage("number not verified"),
   check("apartment", "Invalid apartment value").optional().exists({ checkFalsy: true }).isString(),
   check("address", "Invalid address value").exists({ checkFalsy: true }).isString().withMessage("Invalid address"),
-  check("pincode", "Pincode required").optional()
+  check("pincode", "Pincode required")
+    .optional()
     .exists({ checkFalsy: true })
     .isString()
     .withMessage("Invalid pincode")
@@ -83,7 +84,8 @@ export const clinicUpdateValidation = [
   check("city", "Invalid city value").exists({ checkFalsy: true }).isString().withMessage("Invalid city"),
   check("publicNo", "Invalid public no").optional().exists({ checkFalsy: true }).isNumeric().withMessage("Invalid public phone number").isLength({ min: 10, max: 10 }).withMessage("Invalid phone number"),
 
-  check("pincode", "Pincode required").optional()
+  check("pincode", "Pincode required")
+    .optional()
     .exists({ checkFalsy: true })
     .isString()
     .withMessage("Invalid pincode")
@@ -134,3 +136,5 @@ export const clinicUpdateValidation = [
     })
     .withMessage("Invalid specialities")
 ];
+
+export const clinicSerchValidation = [check("keyword", "Invaid keyword").exists({ checkFalsy: true }).isString(), check("pageNo", "Inavid PageNo").exists({ checkFalsy: true }).isNumeric()];
