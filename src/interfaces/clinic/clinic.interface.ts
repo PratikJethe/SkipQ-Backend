@@ -1,4 +1,4 @@
-import { ObjectId, Document ,PopulatedDoc} from "mongoose";
+import { ObjectId, Document, PopulatedDoc } from "mongoose";
 import internal from "stream";
 import { authProviderEnum, genderEnum } from "../../constants/enums";
 
@@ -43,7 +43,7 @@ export interface IClinic {
   subEndDate: string;
   about?: string;
   publicNo?: number;
-  notice?:string;
+  notice?: string;
   hasClinicStarted: boolean;
 }
 
@@ -72,16 +72,29 @@ export interface IClinicUpdate {
   gender?: genderEnum;
   dateOfBirth?: string;
   profilePicUrl?: string;
-  notice?:string;
-  publicNo?:number
-  about?:string
+  notice?: string;
+  publicNo?: number;
+  about?: string;
   speciality: string[];
 }
-
 
 export interface IFcmClinicTokenModel extends Document {
   clinicId: PopulatedDoc<IClinicModel>;
   fcm: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
+export interface IClinicNotification{
+  clinicId: PopulatedDoc<IClinicModel>;
+  title: string;
+  isSeen:boolean;
+  subtitle?: string;
+
+}
+
+export interface IClinicNotificationModel extends Document {
   createdAt?: string;
   updatedAt?: string;
 }

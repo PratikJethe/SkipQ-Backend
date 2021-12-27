@@ -18,6 +18,35 @@ class ClinicProfile {
       .limit(5);
     return searchedClinic;
   }
+  async searchClinicByLocation(coordinates: number[], pageNo: number) {
+    const searchedClinic: IClinicModel[] = await ClinicModel.aggregate([
+     {
+        $lookup:
+          {
+            from: "user",
+            localField: "_id",
+            foreignField: "_id",
+            as: "populatedFields"
+          },},
+      {
+        $geoNear: {
+    
+          near: { type: "Point", coordinates },
+          distanceField: "dist.calculated",
+          maxDistance: 500 * 1000, // km to meter
+          distanceMultiplier: 1 / 1000, // meter to km
+          includeLocs: "dist.location",
+          spherical: true
+        }
+      },
+
+      { $sort: { "dist.calculated": 1 } },
+      { $skip: pageNo * 5 },
+      { $limit: 5 }
+    ]);
+
+    return searchedClinic;
+  }
 }
 
 export default new ClinicProfile();

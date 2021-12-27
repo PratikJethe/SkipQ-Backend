@@ -6,5 +6,6 @@ import { authMiddleware } from "../../../middlewares/request/authentication.midd
 const router = Router();
 
 router.post("/generate-checksum", authMiddleware, clinicTransactionController.createChecksum);
+router.post("/get-payment-status", clinicTransactionController.paymentStatus);
 
 export default router;

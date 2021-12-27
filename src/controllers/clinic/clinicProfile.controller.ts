@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { pick, pickBy } from "lodash";
+import { parseInt, pick, pickBy } from "lodash";
 import { isValidObjectId } from "mongoose";
 import { type } from "os";
+import { isActiveSubscriptionRequired } from "../../constants/clinic/clinic.constants";
 import clinicDao from "../../dao/clinic/clinic.dao";
 
 import clinicProfileDao from "../../dao/clinic/clinicProfile.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
-import { IClinicModel, IClinicUpdate } from "../../interfaces/clinic/clinic.interface";
+import { IClinicModel, IClinicNotificationModel, IClinicUpdate } from "../../interfaces/clinic/clinic.interface";
 import { ClinicModel } from "../../models/clinic/clinic.model";
+import { clinicNotificationService } from "../../services/clinic/clinicNotification.service";
 
 class ClinicProfileController {
   async getClinicProfile(req: Request, res: Response, next: NextFunction) {
@@ -49,6 +51,42 @@ class ClinicProfileController {
       return next(response);
     }
   }
+  async getClinicNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      const pageNo = parseInt(req.query.pageNo as string)
+      const id = req.client.id
+      console.log(req.query.pageNo)
+      if ( pageNo !==0 && !pageNo) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid pageNo"
+        };
+
+        return next(response);
+      }
+
+      const notifications:IClinicNotificationModel[] = await clinicNotificationService.getNotification(id,pageNo)
+
+ 
+
+      let response: IApiResponse = {
+        status: 200,
+        data: notifications
+      };
+            setTimeout(() => {
+              return next(response);
+              }, 4000);
+
+      // return next(response);
+    } catch (error) {
+      console.log(error);
+      let response: IApiResponse = {
+        status: 500
+      };
+
+      return next(response);
+    }
+  }
   async searchClinicByKeyword(req: Request, res: Response, next: NextFunction) {
     console.log("here");
     try {
@@ -74,10 +112,46 @@ class ClinicProfileController {
         data: searchedClinic
       };
 
-      setTimeout((() => {
-        return next(response);
-      }), 4000)
+      // setTimeout(() => {
+      return next(response);
+      // }, 4000);
+    } catch (error) {
+      console.log(error);
+      let response: IApiResponse = {
+        status: 500
+      };
 
+      return next(response);
+    }
+  }
+  async searchClinicByLocation(req: Request, res: Response, next: NextFunction) {
+    console.log("here");
+    try {
+      const longitude = parseFloat(req.query.longitude as string);
+      const lattitude = parseFloat(req.query.lattitude as string);
+      const pageNo = parseInt(req.query.pageNo as string);
+      console.log(typeof longitude);
+      console.log(longitude);
+      console.log(typeof lattitude);
+      console.log(lattitude);
+
+      if (!(longitude >= -180 && longitude <= 180 && lattitude >= -90 && lattitude <= 90)) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "Invalid search query"
+        };
+
+        return next(response);
+      }
+
+      const searchedClinic: IClinicModel[] = await clinicProfileDao.searchClinicByLocation([longitude, lattitude], pageNo);
+
+      let response: IApiResponse = {
+        status: 200,
+        data: searchedClinic
+      };
+
+      return next(response);
     } catch (error) {
       console.log(error);
       let response: IApiResponse = {
@@ -126,6 +200,23 @@ class ClinicProfileController {
       let response: IApiResponse = {
         status: 200,
         data: updatedClinic
+      };
+
+      return next(response);
+    } catch (e) {
+      console.log(e);
+      let response: IApiResponse = {
+        status: 500
+      };
+
+      return next(response);
+    }
+  }
+  async isSubscriptionRequired(req: Request, res: Response, next: NextFunction) {
+    try {
+      let response: IApiResponse = {
+        status: 200,
+        data: { isActiveSubscriptionRequired }
       };
 
       return next(response);

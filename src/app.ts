@@ -42,6 +42,10 @@ initializeBackend
     //clinic specific routes
     app.use("/api/v1/clinic", clinicRoutes);
 
+    app.get("/", async (req: Request, res: Response, next: NextFunction) => {
+      return res.status(200).send("Welcome");
+    });
+
     //mismatched routes
     app.use("*", (req, res, next) => {
       console.log("not found");
@@ -57,7 +61,7 @@ initializeBackend
       apiResponseService.responseHandler(response, req, res, next);
     });
 
-    app.listen(3000, "192.168.0.104", () => console.log("running"));
+    app.listen(3000, "192.168.0.105", () => console.log("running"));
   })
   .catch((error) => {
     console.log(error);

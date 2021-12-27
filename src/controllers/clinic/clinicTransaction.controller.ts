@@ -3,6 +3,7 @@ import { Interface } from "readline";
 import { Axios as axios } from "axios";
 import { paytmService } from "../../services/transaction/paytm.service";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
+import { paytm_callback_url } from "../../constants/clinic/clinic.constants";
 const paytmchecksum = require("paytmchecksum");
 class ClinicTransactionController {
   async createChecksum(req: Request, res: Response, next: NextFunction) {
@@ -27,7 +28,7 @@ class ClinicTransactionController {
         status: 200,
         data: {
           mid: "OdCdmt83472104874643", //TODO put this urls into config
-          callbackUrl: "https://webhook.site/6ff4ae54-b9bb-4ee4-9587-f965bb2c4f1e",
+          callbackUrl: paytm_callback_url,// no matter what u pass in frontend paytm will take callbackurl passed while creating txnToken. this is only for frontend sdk
           orderId: orderId,
           txnToken: txnToken,
           ammount: costPerMonth * months
@@ -35,6 +36,20 @@ class ClinicTransactionController {
       };
 
       return next(response);
+    } catch (error) {
+      console.log(error);
+      let response: IApiResponse = {
+        status: 500
+      };
+
+      return next(response);
+    }
+  }
+  async paymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(req.body);
+
+      return res.send("<h1>Success</h1>");
     } catch (error) {
       console.log(error);
       let response: IApiResponse = {

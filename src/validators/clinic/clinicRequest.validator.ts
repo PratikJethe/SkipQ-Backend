@@ -138,3 +138,19 @@ export const clinicUpdateValidation = [
 ];
 
 export const clinicSerchValidation = [check("keyword", "Invaid keyword").exists({ checkFalsy: true }).isString(), check("pageNo", "Inavid PageNo").exists({ checkFalsy: true }).isNumeric()];
+
+export const clinicSerchLocationValidation = [
+  check("longitude", "invalid longitude").exists({ checkFalsy: true }),
+
+  check("lattitude", "invalid lattitude").exists({ checkFalsy: true }),
+  check("pageNo", "Inavid PageNo").exists({ checkFalsy: true }).isNumeric()
+
+  // check("coordinates", "Invalid coordinates")
+  //   .exists({ checkFalsy: true })
+  //   .isArray({ min: 2, max: 2 })
+  //   .bail()
+  //   .custom((coordinates) => {
+  //     console.log(coordinates);
+  //     return coordinates >= -180 && coordinates[0] <= 180 && coordinates[1] >= -90 && coordinates[1] <= 90;
+  //   })
+];

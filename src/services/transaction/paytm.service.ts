@@ -1,6 +1,7 @@
 import axios, { Axios } from "axios";
 const https = require("https");
 import { body, header } from "express-validator";
+import { paytm_callback_url } from "../../constants/clinic/clinic.constants";
 const paytmchecksum = require("paytmchecksum");
 
 class PaytmService {
@@ -15,7 +16,7 @@ class PaytmService {
       mid: "OdCdmt83472104874643",
       websiteName: "WEBSTAGING",
       orderId: orderId,
-      callbackUrl: "https://webhook.site/6ff4ae54-b9bb-4ee4-9587-f965bb2c4f1e",
+      callbackUrl: paytm_callback_url,
       txnAmount: {
         value: (value * month).toString(),
         currency: "INR"

@@ -2,21 +2,23 @@ import { Request, Response, NextFunction } from "express";
 import { pickBy } from "lodash";
 import moment from "moment";
 import mongoose, { Mongoose, startSession } from "mongoose";
+import { isActiveSubscriptionRequired } from "../../constants/clinic/clinic.constants";
 import { TokenStatusEnum, UserTypeEnum } from "../../constants/enums/clinic.enum";
 import clinicDao from "../../dao/clinic/clinic.dao";
 import userDao from "../../dao/user/user.dao";
 import { IApiResponse } from "../../interfaces/apiResponse.interface";
-import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
+import { IClinicModel, IClinicNotification, IClinicNotificationModel } from "../../interfaces/clinic/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
 import { IUserModel } from "../../interfaces/user/user.interface";
 import { clinicService } from "../../services/clinic/clinic.service";
+import { clinicNotificationService } from "../../services/clinic/clinicNotification.service";
 import { clinicQueueService } from "../../services/clinic/clinicQueue.service";
 import { fcmService } from "../../services/firebase/fcm.service";
 import { userService } from "../../services/user/user.service";
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!moment(req.clinic.subEndDate).isAfter(moment())) {
+      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "you don't have an active subscription.please activate to use service"
@@ -27,12 +29,15 @@ class ClinicQueueController {
       const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, true);
 
       if (!clinic) {
-        let response: IApiResponse = {
-          status: 500
-        };
-
-        return next(response);
+        throw "clinic failed to start";
       }
+
+      const notification: IClinicNotification = {
+        title: "Clinic Started",
+        isSeen: false,
+        clinicId: clinic.id
+      };
+      await clinicNotificationService.createNotification(notification);
 
       let response: IApiResponse = {
         status: 200,
@@ -64,13 +69,17 @@ class ClinicQueueController {
 
       const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, false);
 
+      
       if (!clinic) {
-        let response: IApiResponse = {
-          status: 500
-        };
-
-        return next(response);
+        throw "failed to stop clinic";
       }
+      const notification: IClinicNotification = {
+        title: "Clinic Started",
+        isSeen: false,
+        clinicId: clinic.id
+      };
+
+      await clinicNotificationService.createNotification(notification);
 
       let response: IApiResponse = {
         status: 200,
@@ -100,7 +109,7 @@ class ClinicQueueController {
         return next(response);
       }
 
-      if (!moment(req.clinic.subEndDate).isAfter(moment())) {
+      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "clinic is out of service"
@@ -241,7 +250,7 @@ class ClinicQueueController {
 
       if (!updateToken) {
         throw new Error("unknown error");
-        return;
+        
       }
 
       let response: IApiResponse = {
@@ -382,6 +391,14 @@ class ClinicQueueController {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "clinic not started yet"
+        };
+        return next(response);
+      }
+
+      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "clinic is out of service"
         };
         return next(response);
       }
