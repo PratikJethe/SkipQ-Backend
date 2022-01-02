@@ -1,13 +1,13 @@
 import express, { Application, Request, Response, json, NextFunction } from "express";
 import { mongoConnect } from "./helpers/mongodb";
-import userRoutes from "./routes/v1/user";
+import userRoutes from "./module/user/routes/v1";
 import { v4 as uuidv4 } from "uuid";
 import { apiResponseService } from "./services/apiResponse.service";
 import { IApiResponse } from "./interfaces/apiResponse.interface";
-import clinicRoutes from "./routes/v1/clinic";
+import clinicRoutes from "./module/clinic/routes/v1";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { ClinicModel } from "./models/clinic/clinic.model";
+import { ClinicModel } from "./module/clinic/model/clinic.model";
 import { firebaseService } from "./services/firebase/firebase.service";
 import { initializeBackend } from "./helpers/initialize";
 const app: Application = express();
@@ -61,7 +61,7 @@ initializeBackend
       apiResponseService.responseHandler(response, req, res, next);
     });
 
-    app.listen(3000, "192.168.0.105", () => console.log("running"));
+    app.listen(3000, "192.168.0.103", () => console.log("running"));
   })
   .catch((error) => {
     console.log(error);

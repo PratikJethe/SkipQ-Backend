@@ -1,7 +1,7 @@
 import axios, { Axios } from "axios";
 const https = require("https");
 import { body, header } from "express-validator";
-import { paytm_callback_url } from "../../constants/clinic/clinic.constants";
+import { paytm_callback_url } from "../../module/clinic/constants/clinic.constants";
 const paytmchecksum = require("paytmchecksum");
 
 class PaytmService {
