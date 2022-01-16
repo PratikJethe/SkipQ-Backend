@@ -14,3 +14,4 @@ export const doctorSpecialty: string[] = [
 export const  paytm_callback_url:string ="https://a3cb-27-106-81-156.ngrok.io/api/v1/clinic/transaction/get-payment-status"
 
 export const isActiveSubscriptionRequired = true;
+

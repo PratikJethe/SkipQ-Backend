@@ -1,6 +1,7 @@
 import { ObjectId, Document, PopulatedDoc } from "mongoose";
 import internal from "stream";
 import { authProviderEnum, genderEnum } from "../../../constants/enums";
+import { IClinicSubscriptionModel } from "./clinicSubscription.inteface";
 
 // interface for mongoose schema
 export interface IClinicModel extends IClinic, Document {
@@ -38,9 +39,8 @@ export interface IClinic {
   profilePicUrl?: string;
   speciality: string[];
   isVerified: boolean;
-  isSubscribed: boolean;
-  subStartDate: string;
-  subEndDate: string;
+  // subStartDate: string;
+  // subEndDate: string;
   about?: string;
   publicNo?: number;
   notice?: string;
@@ -85,16 +85,15 @@ export interface IFcmClinicTokenModel extends Document {
   updatedAt?: string;
 }
 
-
-export interface IClinicNotification{
+export interface IClinicNotification {
   clinicId: PopulatedDoc<IClinicModel>;
   title: string;
-  isSeen:boolean;
+  isSeen: boolean;
   subtitle?: string;
-
 }
 
 export interface IClinicNotificationModel extends Document {
   createdAt?: string;
   updatedAt?: string;
 }
+

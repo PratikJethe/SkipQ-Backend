@@ -7,8 +7,8 @@ const mongoConnect = async () => {
     useFindAndModify: false,
     useCreateIndex: true
   };
-
-  mongoose.connect("mongodb://127.0.0.1:27017/booktokenDB", options);
+console.log(process.env.DB)
+  mongoose.connect(process.env.DB as string, options);
 };
 
 export { mongoConnect };

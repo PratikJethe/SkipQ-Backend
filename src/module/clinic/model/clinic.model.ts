@@ -73,18 +73,7 @@ const ClinicSchema: Schema<IClinicModel> = new Schema<IClinicModel>(
       required: true
     },
     speciality: [{ type: String, enum: doctorSpecialty, required: true }],
-    isSubscribed: {
-      type: Boolean,
-      required: true
-    },
-    subStartDate: {
-      type: Date,
-      required: true
-    },
-    subEndDate: {
-      type: Date,
-      required: true
-    },
+  
     hasClinicStarted: {
       type: Boolean,
       default: false

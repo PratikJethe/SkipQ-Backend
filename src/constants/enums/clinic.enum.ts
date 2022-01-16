@@ -11,3 +11,9 @@ export enum UserTypeEnum {
    ONLINE='ONLINE',
    OFFLINE='OFFLINE'
 }
+
+export enum subscriptionType{
+    FREE_TRIAL="FREE_TRIAL",
+    PAID="PAID",
+    EXTENDED_BY_ADMIN="EXTENDED_BY_ADMIN"
+}

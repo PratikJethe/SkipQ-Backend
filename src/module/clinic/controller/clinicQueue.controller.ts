@@ -9,15 +9,28 @@ import { IUserModel } from "../../user/interface/user.interface";
 import { userService } from "../../user/service/user.service";
 import { isActiveSubscriptionRequired } from "../constants/clinic.constants";
 import clinicDao from "../dao/clinic.dao";
+import clinicSubscriptionDao from "../dao/clinicSubscription.dao";
 import { IClinicModel, IClinicNotification } from "../interface/clinic.interface";
 import { IClinicQueue, IClinicQueueModel } from "../interface/clinicQueue.interface";
+import { IClinicSubscriptionModel } from "../interface/clinicSubscription.inteface";
 import { clinicNotificationService } from "../service/clinicNotification.service";
 import { clinicQueueService } from "../service/clinicQueue.service";
 
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
+
+      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
+
+      if(clinicSubscriptionList.length==0){
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "subscription record not found"
+        };
+        return next(response);
+      }
+
+      if (!moment(clinicSubscriptionList[0].subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "you don't have an active subscription.please activate to use service"
@@ -31,17 +44,21 @@ class ClinicQueueController {
         throw "clinic failed to start";
       }
 
-      const notification: IClinicNotification = {
-        title: "Clinic Started",
-        isSeen: false,
-        clinicId: clinic.id
-      };
-      await clinicNotificationService.createNotification(notification);
+      // const notification: IClinicNotification = {
+      //   title: "Clinic Started",
+      //   isSeen: false,
+      //   clinicId: clinic.id
+      // };
+      // await clinicNotificationService.createNotification(notification);
 
       let response: IApiResponse = {
         status: 200,
         data: clinic
       };
+
+      // setTimeout(() => { //TODO : remove this
+      //   return next(response);
+      //   }, 4000);
 
       return next(response);
     } catch (error) {
@@ -72,13 +89,13 @@ class ClinicQueueController {
       if (!clinic) {
         throw "failed to stop clinic";
       }
-      const notification: IClinicNotification = {
-        title: "Clinic Started",
-        isSeen: false,
-        clinicId: clinic.id
-      };
+      // const notification: IClinicNotification = {
+      //   title: "Clinic Started",
+      //   isSeen: false,
+      //   clinicId: clinic.id
+      // };
 
-      await clinicNotificationService.createNotification(notification);
+      // await clinicNotificationService.createNotification(notification);
 
       let response: IApiResponse = {
         status: 200,
@@ -108,7 +125,19 @@ class ClinicQueueController {
         return next(response);
       }
 
-      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
+      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
+
+      if(clinicSubscriptionList.length==0){
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "subscription record not found"
+        };
+        return next(response);
+      }
+
+
+
+      if (!moment(clinicSubscriptionList[0].subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "clinic is out of service"
@@ -220,7 +249,7 @@ class ClinicQueueController {
         data: updateToken
       };
 
-      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has accepted your token request` });
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr. ${req.clinic.doctorName} has accepted your token request` });
 
       return next(response);
     } catch (error) {
@@ -256,7 +285,7 @@ class ClinicQueueController {
         status: 200,
         data: updateToken
       };
-      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has rejected your token request` });
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr.${req.clinic.doctorName} has rejected your token request` });
 
       return next(response);
     } catch (error) {
@@ -332,7 +361,7 @@ class ClinicQueueController {
         data: updateToken
       };
       if (updateToken.userType == UserTypeEnum.ONLINE) {
-        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `${req.clinic.doctorName} has rejected your token` });
+        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr. ${req.clinic.doctorName} has rejected your token` });
       }
       await userService.sendTokenUpdateNotification(req.clinic.id);
 
@@ -394,10 +423,22 @@ class ClinicQueueController {
         return next(response);
       }
 
-      if (!moment(req.clinic.subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
+      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
+
+      if(clinicSubscriptionList.length==0){
         let response: IApiResponse = {
           status: 400,
-          errorMsg: "clinic is out of service"
+          errorMsg: "subscription record not found"
+        };
+        return next(response);
+      }
+
+
+
+      if (!moment(clinicSubscriptionList[0].subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
+        let response: IApiResponse = {
+          status: 400,
+          errorMsg: "you don't have an active subscription.please activate to use service"
         };
         return next(response);
       }
@@ -450,7 +491,7 @@ class ClinicQueueController {
         status: 200,
         data: tokens
       };
-
+// throw 'ddd'
       return next(response);
     } catch (error) {
       console.log(error);

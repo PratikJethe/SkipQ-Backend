@@ -2,7 +2,7 @@ import { error } from "console";
 import { NextFunction, Request, Response } from "express";
 import { request } from "http";
 import { authProviderEnum, genderEnum } from "../../../constants/enums";
-import { TokenStatusEnum, UserTypeEnum } from "../../../constants/enums/clinic.enum";
+import { subscriptionType, TokenStatusEnum, UserTypeEnum } from "../../../constants/enums/clinic.enum";
 import clinicDao from "../dao/clinic.dao";
 import { IApiResponse } from "../../../interfaces/apiResponse.interface";
 import { IClinic, IClinicModel, IClinicRegistrationDetails, IFcmClinicTokenModel } from "../interface/clinic.interface";
@@ -11,13 +11,26 @@ import { IClinicQueue, IClinicQueueModel } from "../interface/clinicQueue.interf
 import { apiResponseService } from "../../../services/apiResponse.service";
 import { clinicSubscriptionService } from "../service/clinicSubscription.service";
 import { jwtService } from "../../../services/jsonWebToken.service";
+import { ClinicPlanModel } from "../model/clinicPlan";
+import clinicSubscriptionDao from "../dao/clinicSubscription.dao";
+import { IClinicPlanModel, IClinicSubscription } from "../interface/clinicSubscription.inteface";
 
 class ClinicController {
   async registerClinic(req: Request, res: Response, next: NextFunction) {
     try {
       const { doctorName, clinicName, speciality, fcm, address, apartment, coordinates, gender, phoneNo, email, profilePicUrl, dateOfBirth, pincode, city }: IClinicRegistrationDetails = req.body;
 
-      const { subStartDate, subEndDate } = clinicSubscriptionService.generateStartEndDate(1);
+      const freePlanId = "61e3ca023350a60e34942ec3"; // 1 month free plan Id
+
+      const freePlan: IClinicPlanModel | null = await clinicSubscriptionDao.getPlanByID(freePlanId);
+
+      if (!freePlan) {
+        throw "No matching plan found";
+        return;
+      }
+
+      const { subStartDate, subEndDate } = clinicSubscriptionService.generateStartEndDate(freePlan.duration);
+
       console.log(pincode);
       var userCredentials: IClinic = {
         doctorName,
@@ -44,15 +57,19 @@ class ClinicController {
         dateOfBirth,
         clinicName,
         speciality,
-        isSubscribed: true,
-        subEndDate,
-        subStartDate,
         hasClinicStarted: false
       };
 
       const clinic: IClinicModel = await clinicDao.register(userCredentials);
 
-      console.log(clinic.id);
+      const subscriptionPlan: IClinicSubscription = {
+        clinic: clinic.id,
+        plan: freePlan.id,
+        subEndDate,
+        subStartDate,
+        subscriptionType: subscriptionType.FREE_TRIAL
+      };
+      const subscription = await clinicSubscriptionDao.createSubscription(subscriptionPlan);
       const saveFcm: IFcmClinicTokenModel | null = await clinicDao.saveFcm(fcm, clinic.id);
 
       let response: IApiResponse = {
@@ -107,7 +124,7 @@ class ClinicController {
 
       return next(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       let response: IApiResponse = {
         status: 500
       };

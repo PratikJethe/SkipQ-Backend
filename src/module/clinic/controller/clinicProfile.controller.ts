@@ -72,11 +72,11 @@ class ClinicProfileController {
         status: 200,
         data: notifications
       };
-            setTimeout(() => {
-              return next(response);
-              }, 4000);
+            // setTimeout(() => { //TODO : remove this
+            //   return next(response);
+            //   }, 4000);
 
-      // return next(response);
+      return next(response);
     } catch (error) {
       console.log(error);
       let response: IApiResponse = {
@@ -164,7 +164,7 @@ class ClinicProfileController {
   async updateClinic(req: Request, res: Response, next: NextFunction) {
     try {
       const clinic = req.clinic;
-      const { address, clinicName, coordinates, doctorName, pincode, apartment, dateOfBirth, gender, profilePicUrl, speciality, city, about, publicNo } = req.body;
+      const { address, clinicName, coordinates, doctorName, pincode, apartment, dateOfBirth, gender, profilePicUrl, speciality, city, about, publicNo,notice } = req.body;
       const clinicUpadteData: IClinicUpdate = {
         address: {
           address,
@@ -183,7 +183,9 @@ class ClinicProfileController {
         speciality,
         dateOfBirth,
         gender,
-        profilePicUrl
+        profilePicUrl,
+        notice:notice?notice:undefined
+      
       };
       console.log(clinicUpadteData);
 

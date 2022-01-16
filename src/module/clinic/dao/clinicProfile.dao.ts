@@ -22,13 +22,20 @@ class ClinicProfile {
     const searchedClinic: IClinicModel[] = await ClinicModel.aggregate([
       {
         $geoNear: {
-    
           near: { type: "Point", coordinates },
           distanceField: "dist.calculated",
           maxDistance: 500 * 1000, // km to meter
           distanceMultiplier: 1 / 1000, // meter to km
           includeLocs: "dist.location",
           spherical: true
+        }
+      },
+      {
+        $lookup: {
+          as: "supbscription",
+          from:"clinicsubscriptions",
+          let: { clinicId: "$_id" },
+          pipeline: [{ $match: { $expr: { $eq: ["$$clinicId", "$clinic"] } } }, { $sort: { createdAt: -1 } }, {$limit:1}]
         }
       },
 
