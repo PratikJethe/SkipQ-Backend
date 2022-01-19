@@ -70,7 +70,7 @@ initializeBackend
       apiResponseService.responseHandler(response, req, res, next);
     });
 
-    app.listen( process.env.PORT||3000 as any, "192.168.0.103", () => console.log("running"));
+    app.listen( process.env.PORT||3000 as any, () => console.log("running"));
   })
   .catch((error) => {
     console.log(error);

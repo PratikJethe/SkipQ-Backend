@@ -4,3 +4,4 @@ package-lock.json
 src/config/app-config
 .env
 firebase-admin-config.json
+Dockerfile
