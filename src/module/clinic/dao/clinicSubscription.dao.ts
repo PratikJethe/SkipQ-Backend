@@ -15,6 +15,10 @@ class ClinicSubscriptionDao {
     const plan: IClinicPlanModel|null = await ClinicPlanModel.findOne({'_id':id})
     return plan;
   }
+  async getPlanByDuration(duration:number):Promise<IClinicPlanModel|null>{
+    const plan: IClinicPlanModel|null = await ClinicPlanModel.findOne({'duration':duration})
+    return plan;
+  }
 
   async createSubscription(subscription:IClinicSubscription){
       const createdSubscription = await ClinicSubscriptionModel.create(subscription)

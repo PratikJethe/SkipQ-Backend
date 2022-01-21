@@ -22,7 +22,7 @@ class ClinicController {
 
       const freePlanId = "61e3ca023350a60e34942ec3"; // 1 month free plan Id
 
-      const freePlan: IClinicPlanModel | null = await clinicSubscriptionDao.getPlanByID(freePlanId);
+      const freePlan: IClinicPlanModel | null = await clinicSubscriptionDao.getPlanByDuration(process.env.FREE_TRIAL_PERIOD as any);
 
       if (!freePlan) {
         throw "No matching plan found";

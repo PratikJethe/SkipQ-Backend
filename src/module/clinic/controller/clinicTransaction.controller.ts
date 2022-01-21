@@ -121,8 +121,8 @@ class ClinicTransactionController {
 <input type="hidden" name="amount" value="${amount}" />
 <input type="hidden" name="email" value="${email}" />
 <input type="hidden" name="firstname" value="${name}" />
-<input type="hidden" name="surl" value="https://c26f-183-87-154-180.ngrok.io/api/v1/clinic/transaction/success" />
-<input type="hidden" name="furl" value="https://c26f-183-87-154-180.ngrok.io/api/v1/clinic/transaction/failed" />
+<input type="hidden" name="surl" value="${process.env.SERVER_URL}/api/v1/clinic/transaction/success" />
+<input type="hidden" name="furl" value="${process.env.SERVER_URL}/api/v1/clinic/transaction/failed" />
 <input type="hidden" name="udf1" value="${clinic.id}" />
 <input type="hidden" name="udf2" value="${plan.id}" />
 <input type="hidden" name="phone" value="${phone}" />

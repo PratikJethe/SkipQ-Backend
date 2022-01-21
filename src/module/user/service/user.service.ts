@@ -51,7 +51,10 @@ class UserService {
       let token = pendingTokens[i];
 
       if (token.userType == UserTypeEnum.ONLINE) {
-        await this.sendNotificationToSingleUser(token.userId.id, { title: i == 0 ? `its your turn..get ready` : `you are ${i} number away` });
+        await this.sendNotificationToSingleUser(token.userId.id, {
+          title: i == 0 ? `Get Ready` : `Token Update`,
+          body: i == 0 ? `It's your turn..please proceed in` : `you are ${i} token number away`
+        });
       }
     }
   }

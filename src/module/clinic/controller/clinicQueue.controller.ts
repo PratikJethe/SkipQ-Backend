@@ -19,10 +19,9 @@ import { clinicQueueService } from "../service/clinicQueue.service";
 class ClinicQueueController {
   async startClinic(req: Request, res: Response, next: NextFunction) {
     try {
+      var clinicSubscriptionList: IClinicSubscriptionModel[] = await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id);
 
-      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
-
-      if(clinicSubscriptionList.length==0){
+      if (clinicSubscriptionList.length == 0) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "subscription record not found"
@@ -85,7 +84,6 @@ class ClinicQueueController {
 
       const clinic: IClinicModel | null = await clinicDao.updateClinicStart(req.client.id, false);
 
-      
       if (!clinic) {
         throw "failed to stop clinic";
       }
@@ -125,17 +123,15 @@ class ClinicQueueController {
         return next(response);
       }
 
-      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
+      var clinicSubscriptionList: IClinicSubscriptionModel[] = await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id);
 
-      if(clinicSubscriptionList.length==0){
+      if (clinicSubscriptionList.length == 0) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "subscription record not found"
         };
         return next(response);
       }
-
-
 
       if (!moment(clinicSubscriptionList[0].subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
@@ -166,7 +162,8 @@ class ClinicQueueController {
       await fcmService.sendNotifications(
         tokens.map((token) => token.fcm),
         {
-          title: `${req.user.fullName} has requested for token`
+          title:"New Token Request",
+          body: `${req.user.fullName} has requested for token`
         }
       );
 
@@ -249,7 +246,9 @@ class ClinicQueueController {
         data: updateToken
       };
 
-      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr. ${req.clinic.doctorName} has accepted your token request` });
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { 
+        title:"Token Request Accepted",
+        body: `Dr. ${req.clinic.doctorName} has accepted your token request` });
 
       return next(response);
     } catch (error) {
@@ -278,14 +277,15 @@ class ClinicQueueController {
 
       if (!updateToken) {
         throw new Error("unknown error");
-        
       }
 
       let response: IApiResponse = {
         status: 200,
         data: updateToken
       };
-      await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr.${req.clinic.doctorName} has rejected your token request` });
+      await userService.sendNotificationToSingleUser(updateToken.userId.id, { 
+        title:"Token Request Rejected",
+        body: `Dr.${req.clinic.doctorName} has rejected your token request` });
 
       return next(response);
     } catch (error) {
@@ -323,7 +323,9 @@ class ClinicQueueController {
       };
 
       if (updateToken.userType == UserTypeEnum.ONLINE) {
-        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Hope you had good experience. get well soon!` });
+        await userService.sendNotificationToSingleUser(updateToken.userId.id, { 
+          title:"Visit Completed",
+          body: `Hope you had good experience. get well soon!` });
       }
       await userService.sendTokenUpdateNotification(req.clinic.id);
 
@@ -361,7 +363,9 @@ class ClinicQueueController {
         data: updateToken
       };
       if (updateToken.userType == UserTypeEnum.ONLINE) {
-        await userService.sendNotificationToSingleUser(updateToken.userId.id, { title: `Dr. ${req.clinic.doctorName} has rejected your token` });
+        await userService.sendNotificationToSingleUser(updateToken.userId.id, {
+          title:"Token Rejected",
+          body: `Dr. ${req.clinic.doctorName} has rejected your token` });
       }
       await userService.sendTokenUpdateNotification(req.clinic.id);
 
@@ -423,17 +427,15 @@ class ClinicQueueController {
         return next(response);
       }
 
-      var clinicSubscriptionList:IClinicSubscriptionModel[] =await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id)
+      var clinicSubscriptionList: IClinicSubscriptionModel[] = await clinicSubscriptionDao.getLastClinicPlan(req.clinic.id);
 
-      if(clinicSubscriptionList.length==0){
+      if (clinicSubscriptionList.length == 0) {
         let response: IApiResponse = {
           status: 400,
           errorMsg: "subscription record not found"
         };
         return next(response);
       }
-
-
 
       if (!moment(clinicSubscriptionList[0].subEndDate).isAfter(moment()) && isActiveSubscriptionRequired) {
         let response: IApiResponse = {
@@ -491,7 +493,7 @@ class ClinicQueueController {
         status: 200,
         data: tokens
       };
-// throw 'ddd'
+      // throw 'ddd'
       return next(response);
     } catch (error) {
       console.log(error);
