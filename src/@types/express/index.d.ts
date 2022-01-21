@@ -1,6 +1,6 @@
-import { IClinicModel } from "../../interfaces/clinic/clinic.interface";
-import { IClinicQueueModel } from "../../interfaces/clinic/clinicQueue.interface";
-import { IUserModel } from "../../interfaces/user/user.interface";
+import { IClinicModel } from "../../module/clinic/interface/clinic.interface";
+import { IClinicQueueModel } from "../../module/clinic/interface/clinicQueue.interface";
+import { IUserModel } from "../../module/user/interface/user.interface";
 
 export{};
 declare global {
@@ -16,4 +16,9 @@ declare global {
 
       }
     }
+    // namespace NodeJS {
+    //   interface ProcessEnv {
+    //   DB:string
+    //   }
+    // }
   }

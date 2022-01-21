@@ -1,15 +1,18 @@
 import express, { Application, Request, Response, json, NextFunction } from "express";
 import { mongoConnect } from "./helpers/mongodb";
-import userRoutes from "./routes/v1/user";
+import userRoutes from "./module/user/routes/v1";
 import { v4 as uuidv4 } from "uuid";
 import { apiResponseService } from "./services/apiResponse.service";
 import { IApiResponse } from "./interfaces/apiResponse.interface";
-import clinicRoutes from "./routes/v1/clinic";
+import clinicRoutes from "./module/clinic/routes/v1";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { ClinicModel } from "./models/clinic/clinic.model";
+import { ClinicModel } from "./module/clinic/model/clinic.model";
 import { firebaseService } from "./services/firebase/firebase.service";
 import { initializeBackend } from "./helpers/initialize";
+import clinicDao from "./module/clinic/dao/clinic.dao";
+require('dotenv').config({path:'.env'})
+
 const app: Application = express();
 
 //  mongoConnect()
@@ -26,7 +29,11 @@ const app: Application = express();
 initializeBackend
   .initializeBackend()
   .then(() => {
+
+ 
+
     app.use(json());
+    app.use(express.urlencoded({ extended: true }))
     app.use(cookieParser());
     app.use(cors());
 
@@ -42,8 +49,10 @@ initializeBackend
     //clinic specific routes
     app.use("/api/v1/clinic", clinicRoutes);
 
-    app.get("/", async (req: Request, res: Response, next: NextFunction) => {
-      return res.status(200).send("Welcome");
+    app.post("/api/v1/webhook", async (req: Request, res: Response, next: NextFunction) => {
+      console.log('Webhook')
+      console.log(req.body)
+      return res.status(200).send("DONE");
     });
 
     //mismatched routes
@@ -61,7 +70,7 @@ initializeBackend
       apiResponseService.responseHandler(response, req, res, next);
     });
 
-    app.listen(3000, "192.168.0.105", () => console.log("running"));
+    app.listen( process.env.PORT||3000 as any, () => console.log("running"));
   })
   .catch((error) => {
     console.log(error);

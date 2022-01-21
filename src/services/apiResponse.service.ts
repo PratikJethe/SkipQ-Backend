@@ -38,6 +38,9 @@ class ApiResponseService {
     }
     response.resId = req.requestId
 
+    // setTimeout(() => { //TODO : remove this
+    //   return res.status(response.status).json(response)
+    //   }, 2000);
     return res.status(response.status).json(response)
 
 

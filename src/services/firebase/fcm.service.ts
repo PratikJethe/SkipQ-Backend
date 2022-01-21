@@ -7,10 +7,10 @@ class FcmService {
     const message: MulticastMessage = {
       tokens: fcmId,
       data: data,
-      notification: {
-        title: data["title"],
-        body: "testing"
-      }
+      // notification: {
+      //   title: data["title"],
+      //   // body: data["body"]
+      // }
     };
 
     console.log(message);
