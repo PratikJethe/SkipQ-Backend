@@ -14,6 +14,7 @@ import { jwtService } from "../../../services/jsonWebToken.service";
 import { ClinicPlanModel } from "../model/clinicPlan";
 import clinicSubscriptionDao from "../dao/clinicSubscription.dao";
 import { IClinicPlanModel, IClinicSubscription } from "../interface/clinicSubscription.inteface";
+import { doctorSpecialty } from "../constants";
 
 class ClinicController {
   async registerClinic(req: Request, res: Response, next: NextFunction) {
@@ -158,6 +159,26 @@ class ClinicController {
         // maxAge: 600, //  60 sec for test
         httpOnly: true
       });
+
+      return next(response);
+    } catch (error) {
+      let response: IApiResponse = {
+        status: 500
+      };
+      return next(response);
+    }
+  }
+  async getSpecialities(req: Request, res: Response, next: NextFunction) {
+    //verify firebase id
+    try {
+    
+
+      const response: IApiResponse = {
+        data: doctorSpecialty,
+        status: 200
+      };
+
+  
 
       return next(response);
     } catch (error) {
