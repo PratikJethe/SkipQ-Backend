@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { pickBy } from "lodash";
+import { join } from "path";
 import { IApiResponse } from "../../../interfaces/apiResponse.interface";
 import { userProfileDao } from "../dao/userProfile.dao";
 import { IUserModel, IUserUpdate } from "../interface/user.interface";
@@ -56,6 +57,13 @@ class UserProfileController {
       return next(response);
     }
   }
+  async userPrivarcyPolicy(req: Request, res: Response, next: NextFunction) {
+    
+      
+      return res.sendFile(join(__dirname + "../../../../views/privarcy/privarcy.html"));
+
+  }
+   
 }
 
 export const userProfileController = new UserProfileController();
