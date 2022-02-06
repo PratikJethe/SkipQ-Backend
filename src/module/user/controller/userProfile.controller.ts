@@ -60,7 +60,7 @@ class UserProfileController {
   async userPrivarcyPolicy(req: Request, res: Response, next: NextFunction) {
     
       
-      return res.sendFile(join(__dirname + "../../../../views/privarcy/privarcy.html"));
+      return res.sendFile(join(__dirname + "../../../../../views/privarcy/privarcy.html"));
 
   }
    
