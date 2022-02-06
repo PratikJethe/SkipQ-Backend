@@ -7,6 +7,7 @@ import { userUpdateValidation } from "../../validators/userRequest.validator";
 
 const router = Router();
 
+router.get("/privarcy-policy", userProfileController.userPrivarcyPolicy);
 router.use(authMiddleware);
 router.post("/update-profile", [...userUpdateValidation, validationError,getUserByIdFromToken], userProfileController.updateUser);
 

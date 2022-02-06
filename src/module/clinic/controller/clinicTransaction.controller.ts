@@ -14,6 +14,9 @@ import clinicDao from "../dao/clinic.dao";
 import { IClinicSubscription } from "../interface/clinicSubscription.inteface";
 import { subscriptionType } from "../../../constants/enums/clinic.enum";
 import { clinicSubscriptionService } from "../service/clinicSubscription.service";
+import { join } from "path";
+import { fcmService } from "../../../services/firebase/fcm.service";
+
 const paytmchecksum = require("paytmchecksum");
 class ClinicTransactionController {
   async createChecksum(req: Request, res: Response, next: NextFunction) {
@@ -144,38 +147,63 @@ class ClinicTransactionController {
     console.log(req.body);
   }
   async success(req: Request, res: Response, next: NextFunction) {
-    console.log(req.body);
-    console.log(req.params);
-    console.log(req.query);
+    try {
+      var { udf1, udf2 } = req.body;
 
-    var { udf1, udf2 } = req.body;
+      var clinic = await clinicDao.findById(udf1);
+      var plan = await clinicSubscriptionDao.getPlanByID(udf2);
+      if (!plan || !clinic) {
+        return res.status(200).send("<h1>Error</h1>");
+      }
 
-    var clinic = await clinicDao.findById(udf1);
-    var plan = await clinicSubscriptionDao.getPlanByID(udf2);
-    if (!plan || !clinic) {
-      return res.status(200).send("<h1>Error</h1>");
+      const { subStartDate, subEndDate } = clinicSubscriptionService.generateStartEndDate(plan.duration);
+
+      var subscriptionPlan: IClinicSubscription = {
+        clinic: udf1,
+        plan: udf2,
+        subscriptionType: subscriptionType.PAID,
+        subEndDate: subEndDate,
+        subStartDate: subStartDate,
+        paymentInfo: req.body
+      };
+
+      var createdSubscription = await clinicSubscriptionDao.createSubscription(subscriptionPlan);
+
+      const tokens = await clinicDao.getFcmTokens(clinic.id);
+      await fcmService.sendNotifications(
+        tokens.map((token) => token.fcm),
+        {
+          title: "Payment Completed",
+          body: `your subscription has been renewed`
+        }
+      );
+
+      return res.sendFile(join(__dirname + "../../../../views/transaction/success.html"));
+    } catch (error) {
+      return res.sendFile(join(__dirname + "../../../../views/transaction/failure.html"));
     }
-
-    const { subStartDate, subEndDate } = clinicSubscriptionService.generateStartEndDate(plan.duration);
-
-    var subscriptionPlan: IClinicSubscription = {
-      clinic: udf1,
-      plan: udf2,
-      subscriptionType: subscriptionType.PAID,
-      subEndDate: subEndDate,
-      subStartDate: subStartDate
-    };
-
-    var createdSubscription = await clinicSubscriptionDao.createSubscription(subscriptionPlan);
-
-    return res.status(200).send("<h1>Success</h1>");
   }
   async failure(req: Request, res: Response, next: NextFunction) {
-    console.log(req.body);
-    console.log(req.params);
-    console.log(req.query);
+    try {
+      var { udf1, udf2 } = req.body;
 
-    return res.status(200).send("<h1>Failed</h1>");
+      var clinic = await clinicDao.findById(udf1);
+      if (!clinic) {
+        return res.status(200).send("<h1>Error</h1>");
+      }
+      const tokens = await clinicDao.getFcmTokens(clinic.id);
+      await fcmService.sendNotifications(
+        tokens.map((token) => token.fcm),
+        {
+          title: "Payment Failed",
+          body: `your payment attempt has failed`
+        }
+      );
+
+      return res.sendFile(join(__dirname + "../../../../views/transaction/failure.html"));
+    } catch (error) {
+      return res.sendFile(join(__dirname + "../../../../views/transaction/failure.html"));
+    }
   }
 }
 
