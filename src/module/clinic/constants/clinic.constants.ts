@@ -1,13 +1,25 @@
 export const doctorSpecialty: string[] = [
-  "Allergists/Immunologists",
+  "Allergists",
   "Anesthesiologists",
   "Cardiologists",
-  "Colon and Rectal Surgeons",
-  "Dermatologists",
-  "Endocrinologists",
-  "Emergency Medicine Specialists",
-  "Family Physicians",
-  "Gastroenterologists"
+  "Chiropractor",
+  "Dentist",
+  "Dermatologist",
+  "Fertility Specialist",
+  "Gynecologist",
+  "Massage Therapist",
+  "Midwife",
+  "Naturopath",
+  "Neurologist",
+  "Obstetrician",
+  "Oncologist",
+  "Ophthalmologist",
+  "Pediatrician",
+  "Physical Therapist",
+  "Podiatrist",
+  "Psychiatrist",
+  "Radiologist",
+  "General Physician",
 ];
 
 
