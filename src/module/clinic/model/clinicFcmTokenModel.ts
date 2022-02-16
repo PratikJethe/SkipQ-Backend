@@ -5,7 +5,7 @@ import { IFcmUserTokenModel } from "../../user/interface/user.interface";
 import { IFcmClinicTokenModel } from "../interface/clinic.interface";
 const ClinicFcmTokenSchema: Schema<IFcmClinicTokenModel> = new Schema<IFcmClinicTokenModel>(
   {
-    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true },
+    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true,index:true },
     fcm: { type: String, required: true }
   },
 
