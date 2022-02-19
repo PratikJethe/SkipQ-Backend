@@ -3,8 +3,8 @@ import { IClinicQueue, IClinicQueueModel } from "../interface/clinicQueue.interf
 import { TokenStatusEnum, UserTypeEnum } from "../../../constants/enums/clinic.enum";
 const ClinicQueueSchema: Schema<IClinicQueueModel> = new Schema<IClinicQueueModel>(
   {
-    userId: { type: mongoose.Types.ObjectId, ref: "user", required: true },
-    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true },
+    userId: { type: mongoose.Types.ObjectId, ref: "user", required: true,index:true },
+    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true,index:true },
     tokenStatus: { type: String, enum: TokenStatusEnum, required: true },
     userType: { type: String, enum: UserTypeEnum, required: true },
     userName :{type:String,required:false},

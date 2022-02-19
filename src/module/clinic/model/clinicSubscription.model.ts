@@ -4,7 +4,7 @@ import { subscriptionType, TokenStatusEnum, UserTypeEnum } from "../../../consta
 import { IClinicSubscriptionModel } from "../interface/clinicSubscription.inteface";
 const ClinicSubscriptionSchema: Schema<IClinicSubscriptionModel> = new Schema<IClinicSubscriptionModel>(
   {
-    clinic: { type: mongoose.Types.ObjectId, ref: "clinic", required: true },
+    clinic: { type: mongoose.Types.ObjectId, ref: "clinic", required: true,index:true },
     plan: { type: mongoose.Types.ObjectId, ref: "clinicPlans", required: true },
     subStartDate:{type:Date,required:true},
     subEndDate:{type:Date,required:true},

@@ -3,7 +3,7 @@ import { IFcmUserTokenModel } from "../interface/user.interface";
 
 const UserFcmTokenSchema : Schema<IFcmUserTokenModel> = new Schema<IFcmUserTokenModel>(
   {
-    userId: { type: mongoose.Types.ObjectId, ref: "user", required: true },
+    userId: { type: mongoose.Types.ObjectId, ref: "user", required: true,index:true },
    fcm:{type:String,required:true}
   },
 
