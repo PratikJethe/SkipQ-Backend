@@ -4,7 +4,7 @@ import { TokenStatusEnum, UserTypeEnum } from "../../../constants/enums/clinic.e
 import { IClinicNotificationModel } from "../interface/clinic.interface";
 const ClinicNotification: Schema<IClinicNotificationModel> = new Schema<IClinicNotificationModel>(
   {
-    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true },
+    clinicId: { type: mongoose.Types.ObjectId, ref: "clinic", required: true,index:true },
     subtitle: { type: String, trim: true, required: false },
     title: { type: String, trim: true, required: true },
     isSeen: { type: Boolean, trim: true, required: true, default: false }
