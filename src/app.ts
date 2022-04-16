@@ -42,7 +42,7 @@ initializeBackend
     //clinic specific routes
     app.use("/api/v1/clinic", clinicRoutes);
 
-    app.post("/api/v1/webhook", async (req: Request, res: Response, next: NextFunction) => {
+    app.get("/api/v1/webhook", async (req: Request, res: Response, next: NextFunction) => {
       console.log("Webhook");
       console.log(req.body);
       return res.status(200).send("DONE");
