@@ -43,7 +43,7 @@ initializeBackend
     app.use("/api/v1/clinic", clinicRoutes);
 
     app.post("/api/v1/webhook", async (req: Request, res: Response, next: NextFunction) => {
-      console.log("Webhook");
+      console.log("commit to master");
       console.log(req.body);
       return res.status(200).send("DONE");
     });
